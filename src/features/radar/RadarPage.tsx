@@ -133,10 +133,10 @@ export function RadarPage() {
                   </span>
                   <button
                     onClick={() => handleDelete(note.id)}
-                    className="text-muted transition hover:text-cognac"
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-muted transition hover:bg-cognac/10 hover:text-cognac"
                     aria-label="Notu sil"
                   >
-                    <Trash2 size={15} />
+                    <Trash2 size={16} />
                   </button>
                 </div>
                 <p className="font-serif text-lg text-espresso">{note.title}</p>

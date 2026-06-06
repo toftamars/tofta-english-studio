@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Flame, Sparkles, Theater } from "lucide-react";
+import { ArrowRight, Flame, Lightbulb, Sparkles, Theater, Type, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useProgress } from "../../context/ProgressContext";
 import { getUnits, getScenarios, PROFILES } from "../../data";
+import { getWordOfDay } from "../../data/radar";
 import { DailyBulletin } from "../radar/DailyBulletin";
 import { StudyDeck } from "../study/StudyDeck";
+
+const ONBOARD_KEY = "tofta-onboarded-v1";
 
 function greeting() {
   const h = new Date().getHours();
@@ -17,12 +21,31 @@ function greeting() {
 export function Dashboard() {
   const { user } = useAuth();
   const { progress, isUnitDone, level, completedUnits, totalUnits } = useProgress();
+  const [showTip, setShowTip] = useState(() => {
+    try {
+      return !localStorage.getItem(ONBOARD_KEY);
+    } catch {
+      return false;
+    }
+  });
   if (!user) return null;
   const profile = PROFILES[user.profileId];
   const units = getUnits(user.profileId);
   const scenarios = getScenarios(user.profileId);
+  const word = getWordOfDay();
 
   const nextUnit = units.find((u) => !isUnitDone(u.slug)) ?? units[units.length - 1];
+  const nextScenario =
+    scenarios.find((s) => !(progress?.scenariosDone ?? []).includes(s.slug)) ?? scenarios[0];
+
+  function dismissTip() {
+    setShowTip(false);
+    try {
+      localStorage.setItem(ONBOARD_KEY, "1");
+    } catch {
+      /* yoksay */
+    }
+  }
 
   return (
     <div className="flex flex-col gap-7">
@@ -31,6 +54,58 @@ export function Dashboard() {
         <h1 className="font-display text-4xl text-espresso md:text-5xl">
           Bugün 15 dakika, <span className="font-serif italic text-cognac">bir adım daha ileri.</span>
         </h1>
+      </motion.div>
+
+      {/* İlk giriş ipucu */}
+      {showTip && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-start gap-3 rounded-2xl border border-gold/40 bg-gold/10 p-4"
+        >
+          <Lightbulb size={20} className="mt-0.5 shrink-0 text-cognac" />
+          <div className="flex-1 text-sm text-espresso">
+            <p className="font-semibold">Hoş geldin {profile.name}! 👋</p>
+            <p className="text-ink/80">
+              Her gün şu sırayı izle: <b>Günün kelimesi → bir ders → bir senaryo</b>. Aşağıdaki “Bugünkü plan”
+              kartından tek dokunuşla başlayabilirsin.
+            </p>
+          </div>
+          <button onClick={dismissTip} aria-label="İpucunu kapat" className="rounded-full p-2 text-muted hover:text-cognac">
+            <X size={18} />
+          </button>
+        </motion.div>
+      )}
+
+      {/* Bugünkü plan — tek net yol */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="card-luxe overflow-hidden"
+      >
+        <div className="flex flex-col gap-4 p-6">
+          <div>
+            <p className="eyebrow mb-1">Bugünkü planın · ~15 dk</p>
+            <p className="font-serif text-2xl text-espresso">
+              {nextUnit.emoji} {nextUnit.titleTr}
+            </p>
+            <p className="text-sm text-muted">{nextUnit.goalTr}</p>
+          </div>
+          <Link to={`/app/lessons/${nextUnit.slug}`} className="btn-primary min-h-[48px] w-full justify-center sm:w-auto sm:self-start">
+            Bugünün dersini başla <ArrowRight size={18} />
+          </Link>
+          <div className="flex flex-wrap gap-2 border-t border-line pt-3">
+            <Link to="/app/radar" className="chip min-h-[40px] items-center gap-1.5 hover:border-cognac">
+              <Type size={14} /> Kelime: <b className="text-espresso">{word.en}</b>
+            </Link>
+            {nextScenario && (
+              <Link to={`/app/simulator/${nextScenario.slug}`} className="chip min-h-[40px] items-center gap-1.5 hover:border-cognac">
+                <Theater size={14} /> Senaryo: {nextScenario.titleTr}
+              </Link>
+            )}
+          </div>
+        </div>
       </motion.div>
 
       {/* Günün özeti */}
@@ -45,29 +120,6 @@ export function Dashboard() {
 
       {/* Otomatik çalışma kartları (ürün + insider not) */}
       <StudyDeck />
-
-      {/* Devam et */}
-      {nextUnit && (
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="card-luxe overflow-hidden"
-        >
-          <div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="eyebrow mb-1">Kaldığın yerden devam et</p>
-              <p className="font-serif text-2xl text-espresso">
-                {nextUnit.emoji} {nextUnit.titleTr}
-              </p>
-              <p className="text-sm text-muted">{nextUnit.goalTr}</p>
-            </div>
-            <Link to={`/app/lessons/${nextUnit.slug}`} className="btn-primary shrink-0">
-              Derse başla <ArrowRight size={18} />
-            </Link>
-          </div>
-        </motion.div>
-      )}
 
       {/* Üniteler ızgarası */}
       <section>

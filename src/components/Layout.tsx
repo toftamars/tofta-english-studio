@@ -107,13 +107,21 @@ export function Layout() {
           <Sparkles size={16} />
           <span className="font-serif text-lg">Tofta English Studio</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <span className="chip text-xs">🔥 {progress?.streak ?? 0}</span>
-          <button onClick={() => setSettingsOpen(true)} className="text-muted transition hover:text-cognac" aria-label="Ses Ayarları">
-            <Settings size={18} />
+          <button
+            onClick={() => setSettingsOpen(true)}
+            className="grid h-11 w-11 place-items-center rounded-full text-muted transition hover:text-cognac"
+            aria-label="Ses Ayarları"
+          >
+            <Settings size={20} />
           </button>
-          <button onClick={handleSignOut} className="text-muted transition hover:text-cognac" aria-label="Çıkış">
-            <LogOut size={18} />
+          <button
+            onClick={handleSignOut}
+            className="grid h-11 w-11 place-items-center rounded-full text-muted transition hover:text-cognac"
+            aria-label="Çıkış"
+          >
+            <LogOut size={20} />
           </button>
         </div>
       </header>
@@ -134,12 +142,12 @@ export function Layout() {
             end={end}
             className={({ isActive }) =>
               cn(
-                "flex flex-1 flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium transition",
+                "flex min-h-[56px] flex-1 flex-col items-center justify-center gap-1 py-2 text-[11px] font-medium transition",
                 isActive ? "text-cognac" : "text-muted hover:text-ink",
               )
             }
           >
-            <Icon size={20} />
+            <Icon size={21} />
             <span className="leading-none">{label}</span>
           </NavLink>
         ))}

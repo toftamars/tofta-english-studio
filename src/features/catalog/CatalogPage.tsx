@@ -139,8 +139,12 @@ function ProductCard({ p, index, onDelete }: { p: Product; index: number; onDele
           <span className="rounded-full bg-cognac/12 px-2.5 py-0.5 text-[11px] font-semibold text-cognac">
             {p.category}
           </span>
-          <button onClick={onDelete} className="text-muted transition hover:text-cognac" aria-label="Sil">
-            <Trash2 size={15} />
+          <button
+            onClick={onDelete}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-muted transition hover:bg-cognac/10 hover:text-cognac"
+            aria-label="Sil"
+          >
+            <Trash2 size={16} />
           </button>
         </div>
 
