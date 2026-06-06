@@ -145,8 +145,21 @@ function CardBody({ card }: { card: StudyCard }) {
   }
 
   // flashcard
+  const flip = () => setFlipped((f) => !f);
   return (
-    <button onClick={() => setFlipped((f) => !f)} className="flex min-h-[120px] w-full flex-col items-start gap-2 text-left">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={flip}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          flip();
+        }
+      }}
+      className="flex min-h-[120px] w-full cursor-pointer flex-col items-start gap-2 rounded-2xl text-left outline-none focus-visible:ring-2 focus-visible:ring-cognac"
+      aria-label="Çalışma kartı — çevirmek için dokun"
+    >
       <div className="flex w-full items-center justify-between gap-2">
         <p className="font-serif text-2xl text-espresso">{card.front}</p>
         <SpeakButton text={card.speak || card.front} label="" className="!px-2 !py-1" />
@@ -156,6 +169,6 @@ function CardBody({ card }: { card: StudyCard }) {
       ) : (
         <p className="text-xs text-muted">Çevirmek için dokun ↺</p>
       )}
-    </button>
+    </div>
   );
 }

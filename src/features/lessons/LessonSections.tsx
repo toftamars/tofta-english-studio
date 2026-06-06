@@ -57,11 +57,20 @@ export function VocabSection({ unit }: { unit: Unit }) {
 
 function Flashcard({ item }: { item: VocabItem }) {
   const [flipped, setFlipped] = useState(false);
+  const flip = () => setFlipped((f) => !f);
   return (
-    <button
-      onClick={() => setFlipped((f) => !f)}
-      className="group h-36 [perspective:1000px]"
-      aria-label={item.en}
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={flip}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          flip();
+        }
+      }}
+      className="group h-36 cursor-pointer rounded-2xl outline-none [perspective:1000px] focus-visible:ring-2 focus-visible:ring-cognac"
+      aria-label={`${item.en} — çevirmek için dokun`}
     >
       <div
         className={cn(
@@ -79,7 +88,7 @@ function Flashcard({ item }: { item: VocabItem }) {
           {item.example && <span className="text-sm italic text-ivory/70">"{item.example}"</span>}
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 
