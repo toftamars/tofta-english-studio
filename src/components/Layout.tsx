@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { BookOpen, LayoutDashboard, LogOut, MoreHorizontal, Radar, RefreshCw, Settings, ShoppingBag, Sparkles, Theater, TrendingUp, Layers, Zap } from "lucide-react";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 import { useAuth } from "../context/AuthContext";
 import { useProgress } from "../context/ProgressContext";
 import { useMode } from "../context/ModeContext";
@@ -31,6 +32,7 @@ export function Layout() {
   const navigate = useNavigate();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const moreTrapRef = useFocusTrap(moreOpen);
   if (!user) return null;
   const profile = PROFILES[user.profileId];
 
@@ -210,6 +212,7 @@ export function Layout() {
           role="presentation"
         >
           <div
+            ref={moreTrapRef}
             className="w-full rounded-t-3xl bg-paper p-4"
             style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
             onClick={(e) => e.stopPropagation()}

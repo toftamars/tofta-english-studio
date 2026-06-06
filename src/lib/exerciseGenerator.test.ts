@@ -6,7 +6,7 @@ import { cefrFromSkills, defaultSkills, recordDrillAdaptive } from "./adaptive";
 describe("exercisePool", () => {
   it("builds a large merged pool from curriculum + bank", () => {
     const pool = buildExercisePool("hulya");
-    expect(pool.length).toBeGreaterThan(200);
+    expect(pool.length).toBeGreaterThan(400);
     const stats = poolStats("hulya");
     expect(stats.total).toBe(pool.length);
     expect(stats.templates).toBeGreaterThan(15);

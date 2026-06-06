@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Volume2, X } from "lucide-react";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 import {
   getElevenLabsQuota,
   getPreferredVoiceName,
@@ -18,6 +19,7 @@ import {
 const SAMPLE = "Welcome to Louis Vuitton. How may I help you today?";
 
 export function VoiceSettings({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const trapRef = useFocusTrap(open);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [rate, setRate] = useState(0.95);
@@ -63,6 +65,7 @@ export function VoiceSettings({ open, onClose }: { open: boolean; onClose: () =>
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-espresso/40 backdrop-blur-sm md:items-center" onClick={onClose}>
       <motion.div
+        ref={trapRef}
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         onClick={(e) => e.stopPropagation()}

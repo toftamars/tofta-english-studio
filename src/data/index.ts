@@ -10,6 +10,7 @@ import { ALPER_UNITS } from "./curriculum-alper";
 import { HULYA_SCENARIOS } from "./scenarios";
 import { ISTINYE_SCENARIOS } from "./scenarios-istinye";
 import { WORK_EXTRA_SCENARIOS } from "./scenarios-work-bank";
+import { WORK_EXPANSION_SCENARIOS, DAILY_EXPANSION_SCENARIOS, SOCIAL_EXPANSION_SCENARIOS } from "./scenarios-expansion-bank";
 import { DAILY_SCENARIOS } from "./scenarios-daily-bank";
 import { SOCIAL_SCENARIOS } from "./scenarios-social-bank";
 import { ALPER_SCENARIOS } from "./scenarios-alper";
@@ -20,7 +21,7 @@ export { PROFILES, PROFILE_LIST } from "./profiles";
 export { LEARNING_MODES, getModeMeta, cefrLabel, cefrAtLeast } from "./modes";
 
 const WORK_UNITS: Unit[] = [...HULYA_UNITS, ...WORK_EXTRA_UNITS, ...B1_MANAGER_UNITS];
-const WORK_SCENARIOS: Scenario[] = [...HULYA_SCENARIOS, ...ISTINYE_SCENARIOS, ...WORK_EXTRA_SCENARIOS];
+const WORK_SCENARIOS: Scenario[] = [...HULYA_SCENARIOS, ...ISTINYE_SCENARIOS, ...WORK_EXTRA_SCENARIOS, ...WORK_EXPANSION_SCENARIOS];
 
 export const UNITS_BY_PROFILE_MODE: Record<ProfileId, Record<LearningMode, Unit[]>> = {
   hulya: {
@@ -38,13 +39,13 @@ export const UNITS_BY_PROFILE_MODE: Record<ProfileId, Record<LearningMode, Unit[
 export const SCENARIOS_BY_PROFILE_MODE: Record<ProfileId, Record<LearningMode, Scenario[]>> = {
   hulya: {
     work: WORK_SCENARIOS,
-    daily: DAILY_SCENARIOS,
-    social: SOCIAL_SCENARIOS,
+    daily: [...DAILY_SCENARIOS, ...DAILY_EXPANSION_SCENARIOS],
+    social: [...SOCIAL_SCENARIOS, ...SOCIAL_EXPANSION_SCENARIOS],
   },
   alper: {
     work: ALPER_SCENARIOS,
-    daily: DAILY_SCENARIOS,
-    social: SOCIAL_SCENARIOS,
+    daily: [...DAILY_SCENARIOS, ...DAILY_EXPANSION_SCENARIOS],
+    social: [...SOCIAL_SCENARIOS, ...SOCIAL_EXPANSION_SCENARIOS],
   },
 };
 

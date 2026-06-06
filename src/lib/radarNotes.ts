@@ -9,6 +9,11 @@ import { supabase } from "./supabase";
 
 const LOCAL_KEY = "tofta-radar-notes-v1";
 
+export function getLocalRadarNotesSync(): RadarNote[] {
+  if (typeof localStorage === "undefined") return [];
+  return loadLocal();
+}
+
 export interface NewNoteInput {
   title: string;
   body: string;

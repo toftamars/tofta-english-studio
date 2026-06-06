@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, ExternalLink, Languages, Plus, Radar, Trash2 } from "lucide-react";
 import type { RadarItem, RadarNote, RadarNoteCategory } from "../../types";
 import { getWordOfDay } from "../../data/radar";
 import { loadRadar, timeAgoTr } from "../../lib/radar";
 import { addNote, deleteNote, listNotes, type NewNoteInput } from "../../lib/radarNotes";
+import { clearExercisePoolCache } from "../../lib/exercisePool";
 import { translateToTr } from "../../lib/translate";
 import { useAuth } from "../../context/AuthContext";
 import { SpeakButton } from "../../components/ui/SpeakButton";
@@ -46,12 +48,14 @@ export function RadarPage() {
   async function handleAdd(input: NewNoteInput) {
     const note = await addNote(input, user ? { id: user.id, displayName: user.displayName } : undefined);
     setNotes((prev) => [note, ...prev]);
+    clearExercisePoolCache();
     setShowForm(false);
   }
 
   async function handleDelete(id: string) {
     await deleteNote(id);
     setNotes((prev) => prev.filter((n) => n.id !== id));
+    clearExercisePoolCache();
   }
 
   return (
@@ -61,7 +65,10 @@ export function RadarPage() {
           <Radar size={14} /> Maison Radar · Güncel kalmak
         </p>
         <h1 className="font-display text-4xl text-espresso md:text-5xl">Maison Radar</h1>
-        <p className="text-muted">Markanın nabzı: günün kelimesi, son gelişmeler ve atölyeden notların.</p>
+        <p className="text-muted">Markanın nabzı: günün kelimesi, son gelişmeler ve atölyeden notların — kelimeler otomatik alıştırma havuzuna eklenir.</p>
+        <Link to="/app/drill" className="mt-2 inline-block text-sm font-semibold text-cognac hover:underline">
+          Radar kelimeleriyle alıştır →
+        </Link>
       </header>
 
       {/* Günün kelimesi */}

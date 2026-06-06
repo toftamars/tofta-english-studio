@@ -14,7 +14,8 @@ jobs:
         with:
           node-version: "20"
           cache: npm
-      - run: npm ci
+      # npm install (npm ci yerine): Linux runner'da opsiyonel @emnapi/* uyumu için deploy.yml ile aynı.
+      - run: npm install --no-audit --no-fund
       - run: npm run test
       - run: npm run build
       - run: npx playwright install chromium --with-deps

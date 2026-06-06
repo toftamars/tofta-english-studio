@@ -273,7 +273,10 @@ export function SimulatorPlay() {
 
       {/* Sesli mod durum çubuğu */}
       {voiceMode && !finished && (listening || heard) && (
-        <div className={cn("rounded-2xl px-4 py-3 text-sm", listening ? "bg-plum/10 text-plum" : "bg-cream text-ink")}>
+        <div
+          aria-live="polite"
+          className={cn("rounded-2xl px-4 py-3 text-sm", listening ? "bg-plum/10 text-plum" : "bg-cream text-ink")}
+        >
           {listening ? (
             <span className="inline-flex items-center gap-2">
               <Mic size={15} className="animate-pulse" /> Dinliyorum… cevabını İngilizce söyle.

@@ -1,6 +1,7 @@
 import type { LearningMode, PoolEntry, ProfileId } from "../types";
 import { UNITS_BY_PROFILE_MODE, SCENARIOS_BY_PROFILE_MODE } from "../data/index";
 import { WORDS } from "../data/radar";
+import { getRadarPoolEntriesSync } from "./radarPool";
 import { WORD_BANK, SENTENCE_TEMPLATES } from "../data/word-bank";
 
 let cachedPool: PoolEntry[] | null = null;
@@ -57,6 +58,10 @@ export function buildExercisePool(profileId: ProfileId = "hulya", extra: PoolEnt
 
   for (const w of WORDS) {
     add({ en: w.en, tr: w.tr, def: w.note, tags: ["radar"] });
+  }
+
+  for (const r of getRadarPoolEntriesSync()) {
+    add(r);
   }
 
   for (const w of WORD_BANK) {

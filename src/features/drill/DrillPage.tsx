@@ -432,6 +432,7 @@ export function DrillPage() {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
+              aria-live="polite"
               className={cn("text-center text-sm font-medium", feedback === "correct" ? "text-green-700" : "text-red-600")}
             >
               {feedback === "correct" ? "Doğru! ✓" : `Doğrusu: ${ex?.answer}`}

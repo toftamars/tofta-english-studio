@@ -40,6 +40,9 @@ jobs:
           # Tanımlı değilse uygulama YEREL modda derlenir.
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_ELEVENLABS_API_KEY: ${{ secrets.VITE_ELEVENLABS_API_KEY }}
+          VITE_ELEVENLABS_VOICE_ID: ${{ secrets.VITE_ELEVENLABS_VOICE_ID }}
+          VITE_OPENAI_API_KEY: ${{ secrets.VITE_OPENAI_API_KEY }}
 
       - uses: actions/configure-pages@v5
 

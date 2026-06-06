@@ -1,5 +1,6 @@
 import type { RadarData } from "../types";
 import { RADAR_SEED } from "../data/radar";
+import { cacheRadarForPool } from "./radarPool";
 
 // ============================================================
 // Maison Radar — haber yükleyici
@@ -19,8 +20,10 @@ export async function loadRadar(): Promise<RadarData> {
     const data = (await res.json()) as RadarData;
     if (!data?.news?.length) throw new Error("boş radar");
     cache = data;
+    cacheRadarForPool(data);
     return data;
   } catch {
+    cacheRadarForPool(RADAR_SEED);
     return RADAR_SEED;
   }
 }

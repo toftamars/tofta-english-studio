@@ -96,6 +96,16 @@ npm run preview    # derlemeyi önizle
 
 Bu değerler tanımlı değilse uygulama otomatik olarak **yerel modda** çalışır.
 
+### Premium ses ve AI (opsiyonel)
+
+| Secret | Açıklama |
+|--------|----------|
+| `VITE_ELEVENLABS_API_KEY` | Premium TTS — Ayarlar → Ses motoru |
+| `VITE_ELEVENLABS_VOICE_ID` | ElevenLabs ses ID (varsayılan: Rachel) |
+| `VITE_OPENAI_API_KEY` | AI Bonus Diyalog — `/app/simulator/ai-bonus` |
+
+GitHub Pages build'inde bu secret'lar tanımlıysa production'da da aktif olur.
+
 ---
 
 ## 🔒 Güvenlik notu (bulut mod)
