@@ -7,20 +7,24 @@
 //  geldiğini bilmez; modüler yapı korunur.
 // ============================================================
 import type { ProfileId, UserProgress } from "../types";
+import { defaultAdaptive, migrateProgress } from "./adaptive";
 import { supabase } from "./supabase";
 
 const KEY_PREFIX = "tofta-english-v2:";
 
 export function defaultProgress(profileId: ProfileId): UserProgress {
-  return {
+  return migrateProgress({
     profileId,
     xp: 0,
     streak: 0,
     lastActiveDay: null,
     units: {},
+    unitsByMode: { work: {}, daily: {}, social: {} },
     scenariosDone: [],
     badges: [],
-  };
+    activeMode: "work",
+    adaptive: defaultAdaptive(),
+  });
 }
 
 export interface ProgressRepo {
@@ -32,7 +36,7 @@ class LocalProgressRepo implements ProgressRepo {
   async load(profileId: ProfileId): Promise<UserProgress> {
     try {
       const raw = localStorage.getItem(KEY_PREFIX + profileId);
-      if (raw) return { ...defaultProgress(profileId), ...JSON.parse(raw) };
+      if (raw) return migrateProgress({ ...defaultProgress(profileId), ...JSON.parse(raw) });
     } catch {
       /* yoksay */
     }
@@ -55,7 +59,7 @@ class CloudProgressRepo implements ProgressRepo {
       .eq("user_id", userId)
       .maybeSingle();
     if (error || !data) return this.local.load(profileId);
-    return { ...defaultProgress(profileId), ...(data.data as UserProgress) };
+    return migrateProgress({ ...defaultProgress(profileId), ...(data.data as UserProgress) });
   }
 
   async save(progress: UserProgress, userId?: string): Promise<void> {

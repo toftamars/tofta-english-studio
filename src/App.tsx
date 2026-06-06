@@ -1,7 +1,9 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import { useMode } from "./context/ModeContext";
 import { Layout } from "./components/Layout";
 import { LoginPage } from "./features/auth/LoginPage";
+import { ModePickerPage } from "./features/modes/ModePickerPage";
 import { Dashboard } from "./features/dashboard/Dashboard";
 import { LessonsList } from "./features/lessons/LessonsList";
 import { LessonView } from "./features/lessons/LessonView";
@@ -10,6 +12,7 @@ import { SimulatorPlay } from "./features/simulator/SimulatorPlay";
 import { ProgressPage } from "./features/progress/ProgressPage";
 import { RadarPage } from "./features/radar/RadarPage";
 import { CatalogPage } from "./features/catalog/CatalogPage";
+import { ReviewPage } from "./features/review/ReviewDeck";
 
 function Protected({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -24,16 +27,35 @@ function Protected({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function ModeGate({ children }: { children: React.ReactNode }) {
+  const { modeSelected } = useMode();
+  const location = useLocation();
+  if (!modeSelected && !location.pathname.includes("/app/modes")) {
+    return <Navigate to="/app/modes" replace />;
+  }
+  return <>{children}</>;
+}
+
 export default function App() {
   const { user } = useAuth();
   return (
     <Routes>
       <Route path="/" element={user ? <Navigate to="/app" replace /> : <LoginPage />} />
       <Route
+        path="/app/modes"
+        element={
+          <Protected>
+            <ModePickerPage />
+          </Protected>
+        }
+      />
+      <Route
         path="/app"
         element={
           <Protected>
-            <Layout />
+            <ModeGate>
+              <Layout />
+            </ModeGate>
           </Protected>
         }
       >
@@ -45,6 +67,7 @@ export default function App() {
         <Route path="radar" element={<RadarPage />} />
         <Route path="catalog" element={<CatalogPage />} />
         <Route path="progress" element={<ProgressPage />} />
+        <Route path="review" element={<ReviewPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

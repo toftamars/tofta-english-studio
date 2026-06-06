@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Check, Play, Rabbit } from "lucide-react";
-import type { Phrase, Unit, VocabItem } from "../../types";
+import type { Phrase, QuizQuestion, Unit, VocabItem } from "../../types";
 import { SpeakButton } from "../../components/ui/SpeakButton";
 import { MicButton } from "../../components/ui/MicButton";
+import { useProgress } from "../../context/ProgressContext";
+import { useMode } from "../../context/ModeContext";
 import { speak, speakSequence } from "../../lib/speech";
 import { cn } from "../../lib/cn";
 
@@ -118,31 +120,80 @@ export function GrammarSection({ unit }: { unit: Unit }) {
 
 // ---------------- Dinleme ----------------
 export function ListeningSection({ unit }: { unit: Unit }) {
+  const { recordListeningScore } = useProgress();
+  const { mode } = useMode();
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
+  const lq = unit.listeningQuiz ?? [];
+  const lqDone = lq.length > 0 && Object.keys(quizAnswers).length === lq.length;
+
+  function pickLq(qi: number, oi: number) {
+    if (quizAnswers[qi] !== undefined) return;
+    const next = { ...quizAnswers, [qi]: oi };
+    setQuizAnswers(next);
+    if (Object.keys(next).length === lq.length) {
+      const correct = lq.filter((q, i) => next[i] === q.answer).length;
+      recordListeningScore(Math.round((correct / lq.length) * 100), mode);
+    }
+  }
+
   return (
-    <div className="card-luxe p-6">
-      <h3 className="mb-1 font-serif text-2xl text-espresso">Dinleme</h3>
-      <p className="mb-4 text-sm text-muted">Dinle, sonra sesli tekrar et.</p>
-      <div className="flex flex-col gap-2">
-        {unit.listening?.map((line) => (
-          <div key={line} className="flex items-center gap-3 rounded-2xl bg-ivory p-3">
-            <button
-              onClick={() => speak(line)}
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-cognac text-white transition hover:scale-105"
-            >
-              <Play size={16} />
-            </button>
-            <span className="text-espresso">{line}</span>
-          </div>
-        ))}
+    <div className="card-luxe flex flex-col gap-6 p-6">
+      <div>
+        <h3 className="mb-1 font-serif text-2xl text-espresso">Dinleme</h3>
+        <p className="mb-4 text-sm text-muted">Dinle, sonra sesli tekrar et.</p>
+        <div className="flex flex-col gap-2">
+          {unit.listening?.map((line) => (
+            <div key={line} className="flex items-center gap-3 rounded-2xl bg-ivory p-3">
+              <button
+                onClick={() => speak(line)}
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-cognac text-white transition hover:scale-105"
+              >
+                <Play size={16} />
+              </button>
+              <span className="text-espresso">{line}</span>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button onClick={() => speakSequence(unit.listening ?? [], { rate: 0.92 })} className="btn-ghost">
+            <Play size={16} /> Hepsini dinle
+          </button>
+          <button onClick={() => speakSequence(unit.listening ?? [], { rate: 0.62 })} className="btn-ghost">
+            <Rabbit size={16} /> Yavaş dinle
+          </button>
+        </div>
       </div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <button onClick={() => speakSequence(unit.listening ?? [], { rate: 0.92 })} className="btn-ghost">
-          <Play size={16} /> Hepsini dinle
-        </button>
-        <button onClick={() => speakSequence(unit.listening ?? [], { rate: 0.62 })} className="btn-ghost">
-          <Rabbit size={16} /> Yavaş dinle
-        </button>
-      </div>
+
+      {lq.length > 0 && (
+        <div className="border-t border-line pt-5">
+          <h4 className="mb-2 font-serif text-lg text-espresso">Anlama soruları</h4>
+          <p className="mb-3 text-sm text-muted">Dinledikten sonra cevapla — seviye takibine girer.</p>
+          {lq.map((q, qi) => (
+            <div key={qi} className="mb-4">
+              <p className="mb-2 font-medium text-espresso">{qi + 1}. {q.q}</p>
+              <div className="flex flex-col gap-2">
+                {q.options.map((opt, oi) => (
+                  <button
+                    key={oi}
+                    disabled={quizAnswers[qi] !== undefined}
+                    onClick={() => pickLq(qi, oi)}
+                    className={cn(
+                      "rounded-xl border px-4 py-3 text-left transition",
+                      quizAnswers[qi] === undefined && "border-line hover:border-cognac",
+                      quizAnswers[qi] === oi && oi === q.answer && "border-sage bg-sage/10",
+                      quizAnswers[qi] === oi && oi !== q.answer && "border-plum bg-plum/10",
+                    )}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+              {quizAnswers[qi] !== undefined && <p className="mt-1 text-xs text-muted">{q.explainTr}</p>}
+            </div>
+          ))}
+          {lqDone && <p className="text-sm text-sage">Dinleme quizi tamamlandı ✓</p>}
+        </div>
+      )}
     </div>
   );
 }
@@ -174,7 +225,22 @@ export function SpeakingSection({ unit }: { unit: Unit }) {
 export function WritingSection({ unit }: { unit: Unit }) {
   const [text, setText] = useState("");
   const [showSample, setShowSample] = useState(false);
+  const [checked, setChecked] = useState<Record<number, boolean>>({});
+  const { recordWritingDone } = useProgress();
+  const { mode } = useMode();
   if (!unit.writing) return null;
+  const checklist = unit.writing.checklist ?? [];
+  const allChecked = checklist.length === 0 || checklist.every((_, i) => checked[i]);
+
+  function toggleCheck(i: number) {
+    setChecked((c) => ({ ...c, [i]: !c[i] }));
+  }
+
+  function finishWriting() {
+    if (text.trim().length < 10) return;
+    recordWritingDone(mode);
+  }
+
   return (
     <div className="card-luxe p-6">
       <h3 className="mb-3 font-serif text-2xl text-espresso">Yazma Alıştırması</h3>
@@ -185,12 +251,30 @@ export function WritingSection({ unit }: { unit: Unit }) {
         placeholder="Cevabını buraya İngilizce yaz..."
         className="min-h-32 w-full resize-y rounded-2xl border border-line bg-paper p-4 outline-none focus:border-cognac"
       />
+      {checklist.length > 0 && (
+        <div className="mt-4 rounded-2xl bg-cream/60 p-4">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-cognac">Kontrol listesi</p>
+          <ul className="flex flex-col gap-2">
+            {checklist.map((item, i) => (
+              <li key={item}>
+                <label className="flex cursor-pointer items-start gap-2 text-sm">
+                  <input type="checkbox" checked={!!checked[i]} onChange={() => toggleCheck(i)} className="mt-1" />
+                  <span>{item}</span>
+                </label>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div className="mt-3 flex flex-wrap gap-2">
         <button onClick={() => setShowSample((s) => !s)} className="btn-primary">
           {showSample ? "Örneği gizle" : "Örnek cevabı göster"}
         </button>
         <button onClick={() => text.trim() && speak(text)} className="btn-ghost">
           🔊 Yazdığımı oku
+        </button>
+        <button onClick={finishWriting} disabled={!allChecked || text.trim().length < 10} className="btn-gold disabled:opacity-50">
+          <Check size={16} /> Yazmayı tamamladım
         </button>
       </div>
       {showSample && (
@@ -207,7 +291,13 @@ export function WritingSection({ unit }: { unit: Unit }) {
 }
 
 // ---------------- Quiz ----------------
-export function QuizSection({ unit, onScore }: { unit: Unit; onScore: (score: number) => void }) {
+export function QuizSection({
+  unit,
+  onScore,
+}: {
+  unit: Unit;
+  onScore: (score: number, wrong: QuizQuestion[]) => void;
+}) {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const total = unit.quiz?.length ?? 0;
   const answered = Object.keys(answers).length;
@@ -218,8 +308,9 @@ export function QuizSection({ unit, onScore }: { unit: Unit; onScore: (score: nu
     const next = { ...answers, [qi]: oi };
     setAnswers(next);
     if (Object.keys(next).length === total) {
+      const wrong = (unit.quiz ?? []).filter((q, i) => next[i] !== q.answer);
       const score = (unit.quiz ?? []).filter((q, i) => next[i] === q.answer).length;
-      onScore(Math.round((score / total) * 100));
+      onScore(Math.round((score / total) * 100), wrong);
     }
   }
 

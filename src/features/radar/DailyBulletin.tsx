@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Radar } from "lucide-react";
+import { Radar } from "lucide-react";
 import type { RadarItem } from "../../types";
 import { getWordOfDay } from "../../data/radar";
 import { loadRadar } from "../../lib/radar";
 import { SpeakButton } from "../../components/ui/SpeakButton";
+import { NewsMiniLesson } from "./NewsMiniLesson";
 
 // "Günün LV Bülteni" — Dashboard'da kompakt, mobil-öncelikli kart.
 export function DailyBulletin() {
@@ -51,21 +52,16 @@ export function DailyBulletin() {
 
         {/* En güncel gelişme */}
         {top && (
-          <a
-            href={top.url}
-            target="_blank"
-            rel="noreferrer"
-            className="group flex items-start gap-3 rounded-2xl bg-paper/70 p-3 ring-1 ring-line transition hover:ring-cognac/40"
-          >
-            <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-cream text-base">📰</span>
-            <span className="min-w-0">
-              <span className="block truncate text-xs text-muted">{top.source}</span>
-              <span className="block font-medium leading-snug text-espresso group-hover:text-cognac">
-                {top.title}
+          <div className="rounded-2xl bg-paper/70 p-3 ring-1 ring-line">
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-cream text-base">📰</span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-xs text-muted">{top.source}</span>
+                <span className="block font-medium leading-snug text-espresso">{top.title}</span>
               </span>
-            </span>
-            <ArrowRight size={16} className="ml-auto mt-1 shrink-0 text-muted group-hover:text-cognac" />
-          </a>
+            </div>
+            <NewsMiniLesson item={top} />
+          </div>
         )}
       </div>
     </motion.div>

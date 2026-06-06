@@ -5,13 +5,16 @@ import "./index.css";
 import App from "./App";
 import { AuthProvider } from "./context/AuthContext";
 import { ProgressProvider } from "./context/ProgressContext";
+import { ModeProvider } from "./context/ModeContext";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <HashRouter>
       <AuthProvider>
         <ProgressProvider>
-          <App />
+          <ModeProvider>
+            <App />
+          </ModeProvider>
         </ProgressProvider>
       </AuthProvider>
     </HashRouter>

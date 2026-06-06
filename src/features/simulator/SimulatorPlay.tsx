@@ -3,7 +3,9 @@ import { Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Mic, PartyPopper } from "lucide-react";
 import { getScenario } from "../../data";
+import { useAuth } from "../../context/AuthContext";
 import { useProgress } from "../../context/ProgressContext";
+import { useMode } from "../../context/ModeContext";
 import type { DialogueStep, ReplyOption } from "../../types";
 import { SpeakButton } from "../../components/ui/SpeakButton";
 import { MicButton } from "../../components/ui/MicButton";
@@ -18,7 +20,9 @@ interface HeardResult {
 
 export function SimulatorPlay() {
   const { slug } = useParams();
-  const scenario = slug ? getScenario(slug) : undefined;
+  const { user } = useAuth();
+  const { mode } = useMode();
+  const scenario = slug && user ? getScenario(slug, user.profileId, mode) : undefined;
   const { completeScenario, progress } = useProgress();
 
   const [stepIdx, setStepIdx] = useState(0);
@@ -194,7 +198,7 @@ export function SimulatorPlay() {
     setStepIdx((s) => {
       if (s >= scenario!.steps.length - 1) {
         setFinished(true);
-        completeScenario(scenario!.slug);
+        completeScenario(scenario!.slug, mode, heard?.score ?? 65);
         return s;
       }
       return s + 1;
@@ -206,7 +210,7 @@ export function SimulatorPlay() {
     stopListening();
     if (isLast) {
       setFinished(true);
-      completeScenario(scenario!.slug);
+      completeScenario(scenario!.slug, mode);
     } else {
       setStepIdx((s) => s + 1);
     }

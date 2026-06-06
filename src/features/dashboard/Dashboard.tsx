@@ -4,10 +4,12 @@ import { motion } from "framer-motion";
 import { ArrowRight, Flame, Lightbulb, Sparkles, Theater, Type, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useProgress } from "../../context/ProgressContext";
-import { getUnits, getScenarios, PROFILES } from "../../data";
+import { useMode } from "../../context/ModeContext";
+import { getUnits, getScenarios, PROFILES, cefrLabel } from "../../data";
 import { getWordOfDay } from "../../data/radar";
 import { DailyBulletin } from "../radar/DailyBulletin";
 import { StudyDeck } from "../study/StudyDeck";
+import { ReviewDeck } from "../review/ReviewDeck";
 
 const ONBOARD_KEY = "tofta-onboarded-v1";
 
@@ -20,7 +22,8 @@ function greeting() {
 
 export function Dashboard() {
   const { user } = useAuth();
-  const { progress, isUnitDone, level, completedUnits, totalUnits } = useProgress();
+  const { progress, isUnitDone, level, completedUnits, totalUnits, reviewsDue } = useProgress();
+  const { mode, modeMeta } = useMode();
   const [showTip, setShowTip] = useState(() => {
     try {
       return !localStorage.getItem(ONBOARD_KEY);
@@ -30,8 +33,9 @@ export function Dashboard() {
   });
   if (!user) return null;
   const profile = PROFILES[user.profileId];
-  const units = getUnits(user.profileId);
-  const scenarios = getScenarios(user.profileId);
+  const cefr = progress?.adaptive?.cefrBand ?? "A2";
+  const units = getUnits(user.profileId, mode, cefr);
+  const scenarios = getScenarios(user.profileId, mode, cefr);
   const word = getWordOfDay();
 
   const nextUnit = units.find((u) => !isUnitDone(u.slug)) ?? units[units.length - 1];
@@ -52,8 +56,9 @@ export function Dashboard() {
       <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <p className="eyebrow">{greeting()}, {profile.name}</p>
         <h1 className="font-display text-4xl text-espresso md:text-5xl">
-          Bugün 15 dakika, <span className="font-serif italic text-cognac">bir adım daha ileri.</span>
+          {modeMeta.emoji} {modeMeta.labelTr} modu · <span className="font-serif italic text-cognac">{cefrLabel(cefr)}</span>
         </h1>
+        <p className="mt-1 text-sm text-muted">{modeMeta.descriptionTr}</p>
       </motion.div>
 
       {/* İlk giriş ipucu */}
@@ -67,8 +72,8 @@ export function Dashboard() {
           <div className="flex-1 text-sm text-espresso">
             <p className="font-semibold">Hoş geldin {profile.name}! 👋</p>
             <p className="text-ink/80">
-              Her gün şu sırayı izle: <b>Günün kelimesi → bir ders → bir senaryo</b>. Aşağıdaki “Bugünkü plan”
-              kartından tek dokunuşla başlayabilirsin.
+              Her gün: <b>Günün kelimesi → bir ders → bir senaryo{reviewsDue > 0 ? " → tekrar" : ""}</b>.
+              Mod değiştirmek için üstteki {modeMeta.label} etiketine dokun.
             </p>
           </div>
           <button onClick={dismissTip} aria-label="İpucunu kapat" className="rounded-full p-2 text-muted hover:text-cognac">
@@ -115,11 +120,14 @@ export function Dashboard() {
         <StatCard icon={<span className="text-lg">📘</span>} label="Üniteler" value={`${completedUnits}/${totalUnits}`} />
       </div>
 
-      {/* Günün LV Bülteni */}
-      <DailyBulletin />
+      {/* Günün LV Bülteni (Work modunda) */}
+      {mode === "work" && <DailyBulletin />}
 
-      {/* Otomatik çalışma kartları (ürün + insider not) */}
-      <StudyDeck />
+      {/* Akıllı tekrar */}
+      <ReviewDeck />
+
+      {/* Otomatik çalışma kartları */}
+      {mode === "work" && <StudyDeck />}
 
       {/* Üniteler ızgarası */}
       <section>

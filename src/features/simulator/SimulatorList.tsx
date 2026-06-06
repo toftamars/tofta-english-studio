@@ -2,22 +2,25 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import { useProgress } from "../../context/ProgressContext";
+import { useMode } from "../../context/ModeContext";
 import { getScenarios } from "../../data";
 import { cn } from "../../lib/cn";
 
 export function SimulatorList() {
   const { user } = useAuth();
   const { progress } = useProgress();
+  const { mode, modeMeta } = useMode();
   if (!user) return null;
-  const scenarios = getScenarios(user.profileId);
+  const cefr = progress?.adaptive?.cefrBand ?? "A2";
+  const scenarios = getScenarios(user.profileId, mode, cefr);
 
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <p className="eyebrow">Rol-Yapma · Pratik</p>
+        <p className="eyebrow">{modeMeta.label} mod</p>
         <h1 className="font-display text-4xl text-espresso">Simülatör</h1>
         <p className="text-muted">
-          Gerçek müşteri ve yönetici diyaloglarını oyna. En iyi cevabı seç, geri bildirim al, sesli söyle.
+          {scenarios.length} senaryo · sesli sohbet modu ile karşılıklı pratik.
         </p>
       </header>
 

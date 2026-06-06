@@ -4,6 +4,51 @@
 
 export type ProfileId = "hulya" | "alper";
 
+/** Öğrenme modu — giriş sonrası seçilir, içerik ve ilerleme buna göre ayrılır */
+export type LearningMode = "work" | "daily" | "social";
+
+/** CEFR seviye bandı — XP'den bağımsız gerçek dil seviyesi */
+export type CefrBand = "A1" | "A2" | "B1" | "B2";
+
+export interface SkillScores {
+  speaking: number;
+  listening: number;
+  vocab: number;
+  grammar: number;
+  writing: number;
+}
+
+/** Aralıklı tekrar kartı (yanlış quiz/kelime) */
+export interface ReviewItem {
+  id: string;
+  mode: LearningMode;
+  kind: "vocab" | "quiz" | "phrase";
+  front: string;
+  back: string;
+  speak?: string;
+  dueAt: string;
+  intervalDays: number;
+  ease: number;
+}
+
+/** Canlı seviye takibi — oyun XP'sinden ayrı */
+export interface AdaptiveState {
+  cefrBand: CefrBand;
+  skills: SkillScores;
+  reviews: ReviewItem[];
+  history: { date: string; kind: string; score: number; mode: LearningMode }[];
+  updatedAt: string;
+}
+
+export interface LearningModeMeta {
+  id: LearningMode;
+  label: string;
+  labelTr: string;
+  emoji: string;
+  descriptionTr: string;
+  accent: string;
+}
+
 export interface Profile {
   id: ProfileId;
   name: string;
@@ -73,8 +118,14 @@ export interface Unit {
   grammar?: GrammarPoint;
   listening?: string[];
   speaking?: string[];
-  writing?: { taskTr: string; sample: string };
+  writing?: { taskTr: string; sample: string; checklist?: string[] };
+  /** Dinleme anlama soruları (TTS sonrası) */
+  listeningQuiz?: QuizQuestion[];
   quiz?: QuizQuestion[];
+  /** Hangi moda ait (varsayılan work) */
+  mode?: LearningMode;
+  /** Önerilen minimum CEFR — seviye yükseldikçe açılır */
+  minCefr?: CefrBand;
   /** Bu üniteyle ilişkili rol-yapma senaryosu (slug) */
   scenarioSlug?: string;
 }
@@ -105,6 +156,8 @@ export interface Scenario {
   descriptionTr: string;
   difficulty: 1 | 2 | 3;
   steps: DialogueStep[];
+  mode?: LearningMode;
+  minCefr?: CefrBand;
 }
 
 // ---------------- İlerleme / Kullanıcı ----------------
@@ -122,9 +175,14 @@ export interface UserProgress {
   xp: number;
   streak: number;
   lastActiveDay: string | null;
+  /** @deprecated unitsByMode kullan — geriye uyumluluk için tutulur */
   units: SectionProgress;
+  /** Mod bazlı ilerleme */
+  unitsByMode?: Partial<Record<LearningMode, SectionProgress>>;
   scenariosDone: string[];
   badges: string[];
+  activeMode?: LearningMode;
+  adaptive?: AdaptiveState;
 }
 
 export interface AuthUser {

@@ -2,25 +2,28 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import { useProgress } from "../../context/ProgressContext";
-import { getUnits } from "../../data";
+import { useMode } from "../../context/ModeContext";
+import { getUnits, cefrLabel } from "../../data";
 
 export function LessonsList() {
   const { user } = useAuth();
-  const { isUnitDone } = useProgress();
+  const { isUnitDone, progress } = useProgress();
+  const { mode, modeMeta } = useMode();
   if (!user) return null;
-  const units = getUnits(user.profileId);
+  const cefr = progress?.adaptive?.cefrBand ?? "A2";
+  const units = getUnits(user.profileId, mode, cefr);
 
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <p className="eyebrow">Müfredat · A2</p>
+        <p className="eyebrow">{modeMeta.label} mod · {cefrLabel(cefr)}</p>
         <h1 className="font-display text-4xl text-espresso">Dersler</h1>
-        <p className="text-muted">Louis Vuitton'a özel 10 ünite · satıştan markaya kadar her şey.</p>
+        <p className="text-muted">{units.length} ünite · seviyene uygun içerik açık.</p>
       </header>
 
       <div className="grid gap-3 sm:grid-cols-2">
         {units.map((u, i) => {
-          const done = isUnitDone(u.slug);
+          const done = isUnitDone(u.slug, mode);
           return (
             <motion.div
               key={u.slug}

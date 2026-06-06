@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { BookOpen, LayoutDashboard, LogOut, Radar, Settings, ShoppingBag, Sparkles, Theater, TrendingUp } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogOut, Radar, RefreshCw, Settings, ShoppingBag, Sparkles, Theater, TrendingUp } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useProgress } from "../context/ProgressContext";
-import { PROFILES } from "../data";
+import { useMode } from "../context/ModeContext";
+import { PROFILES, cefrLabel } from "../data";
 import { ProgressRing } from "./ui/ProgressRing";
 import { VoiceSettings } from "../features/settings/VoiceSettings";
 import { cn } from "../lib/cn";
@@ -12,6 +13,7 @@ const NAV = [
   { to: "/app", label: "Panel", icon: LayoutDashboard, end: true },
   { to: "/app/lessons", label: "Dersler", icon: BookOpen },
   { to: "/app/simulator", label: "Simülatör", icon: Theater },
+  { to: "/app/review", label: "Tekrar", icon: RefreshCw },
   { to: "/app/radar", label: "Radar", icon: Radar },
   { to: "/app/catalog", label: "Katalog", icon: ShoppingBag },
   { to: "/app/progress", label: "Gelişim", icon: TrendingUp },
@@ -19,11 +21,14 @@ const NAV = [
 
 export function Layout() {
   const { user, signOut } = useAuth();
-  const { level, completedUnits, totalUnits, progress } = useProgress();
+  const { level, completedUnits, totalUnits, progress, reviewsDue } = useProgress();
+  const { modeMeta } = useMode();
   const navigate = useNavigate();
   const [settingsOpen, setSettingsOpen] = useState(false);
   if (!user) return null;
   const profile = PROFILES[user.profileId];
+
+  const cefr = progress?.adaptive?.cefrBand ?? "A2";
 
   async function handleSignOut() {
     await signOut();
@@ -46,6 +51,12 @@ export function Layout() {
           <div>
             <p className="font-serif text-xl leading-tight text-espresso">{profile.name}</p>
             <p className="text-xs text-muted">{profile.role}</p>
+            <button
+              onClick={() => navigate("/app/modes")}
+              className="mt-1 inline-flex items-center gap-1 rounded-full bg-cream px-2 py-0.5 text-[11px] font-semibold text-cognac hover:bg-cognac/10"
+            >
+              {modeMeta.emoji} {modeMeta.label} · {cefrLabel(cefr)}
+            </button>
           </div>
         </div>
 
@@ -60,6 +71,7 @@ export function Layout() {
             <span className="chip">🔥 {progress?.streak ?? 0} gün</span>
             <span className="chip">📘 {completedUnits}/{totalUnits}</span>
             <span className="chip">✦ {progress?.xp ?? 0} XP</span>
+            {reviewsDue > 0 && <span className="chip text-cognac">🧠 {reviewsDue}</span>}
           </div>
         </div>
 

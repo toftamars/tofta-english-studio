@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Theater } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useProgress } from "../../context/ProgressContext";
+import { useMode } from "../../context/ModeContext";
 import { getUnits } from "../../data";
 import type { LessonSectionKind, Unit } from "../../types";
 import {
@@ -43,8 +44,10 @@ function availableSections(unit: Unit): LessonSectionKind[] {
 export function LessonView() {
   const { slug } = useParams();
   const { user } = useAuth();
-  const { completeSection, recordQuiz, isSectionDone } = useProgress();
-  const units = user ? getUnits(user.profileId) : [];
+  const { mode } = useMode();
+  const { completeSection, recordQuiz, isSectionDone, progress } = useProgress();
+  const cefr = progress?.adaptive?.cefrBand;
+  const units = user ? getUnits(user.profileId, mode, cefr) : [];
   const index = units.findIndex((u) => u.slug === slug);
   const unit = units[index];
 
@@ -92,10 +95,10 @@ export function LessonView() {
             className={cn(
               "rounded-full border px-4 py-2 text-sm font-medium transition",
               active === s ? "border-cognac bg-cognac text-white" : "border-line bg-paper hover:border-cognac",
-              isSectionDone(unit.slug, s) && active !== s && "border-sage/40",
+              isSectionDone(unit.slug, s, mode) && active !== s && "border-sage/40",
             )}
           >
-            {isSectionDone(unit.slug, s) && "✓ "}
+            {isSectionDone(unit.slug, s, mode) && "✓ "}
             {SECTION_LABELS[s]}
           </button>
         ))}
@@ -109,13 +112,16 @@ export function LessonView() {
         {active === "speaking" && <SpeakingSection unit={unit} />}
         {active === "writing" && <WritingSection unit={unit} />}
         {active === "quiz" && (
-          <QuizSection unit={unit} onScore={(score) => recordQuiz(unit.slug, score, total)} />
+          <QuizSection
+            unit={unit}
+            onScore={(score, wrong) => recordQuiz(unit.slug, score, total, mode, wrong)}
+          />
         )}
 
         {active !== "quiz" && (
           <SectionDoneBar
-            done={isSectionDone(unit.slug, active)}
-            onDone={() => completeSection(unit.slug, active, total)}
+            done={isSectionDone(unit.slug, active, mode)}
+            onDone={() => completeSection(unit.slug, active, total, mode)}
           />
         )}
       </div>

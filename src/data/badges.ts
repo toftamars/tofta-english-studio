@@ -14,6 +14,7 @@ export const BADGES: BadgeDef[] = [
   { id: "first-scenario", emoji: "🎭", title: "Role Player", descTr: "İlk simülasyonu oynadın." },
   { id: "role-player", emoji: "🎬", title: "Showtime", descTr: "5 simülasyon tamamladın." },
   { id: "xp-300", emoji: "🚀", title: "Rising Star", descTr: "300 XP'ye ulaştın." },
+  { id: "cefr-b1", emoji: "🎓", title: "B1 Ready", descTr: "Gerçek dil seviyen B1'e ulaştı." },
 ];
 
 export function badgeById(id: string): BadgeDef | undefined {
