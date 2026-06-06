@@ -133,3 +133,47 @@ export interface AuthUser {
   profileId: ProfileId;
   displayName: string;
 }
+
+// ---------------- Maison Radar (güncel içerik) ----------------
+
+/** Otomatik (RSS) çekilen haber/gelişme öğesi */
+export interface RadarItem {
+  title: string;
+  source: string;
+  url: string;
+  publishedAt: string; // ISO
+  summary?: string;
+  tag?: string; // Koleksiyon / Marka / Moda / Sektör
+}
+
+/** public/radar.json yapısı (cron tarafından üretilir) */
+export interface RadarData {
+  updatedAt: string; // ISO
+  news: RadarItem[];
+}
+
+/** Hülya/Alper'in elle eklediği "insider" not — en güvenilir, yasal kaynak */
+export interface RadarNote {
+  id: string;
+  authorId?: string;
+  authorName?: string;
+  title: string;
+  body: string;
+  category: RadarNoteCategory;
+  createdAt: string; // ISO
+}
+
+export type RadarNoteCategory =
+  | "Koleksiyon"
+  | "Materyal"
+  | "Mağaza"
+  | "Vizyon"
+  | "Müşteri"
+  | "Diğer";
+
+/** Günün LV temalı kelimesi */
+export interface WordOfDay {
+  en: string;
+  tr: string;
+  note: string; // LV bağlamında neden önemli
+}

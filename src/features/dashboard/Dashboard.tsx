@@ -4,6 +4,7 @@ import { ArrowRight, Flame, Sparkles, Theater } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useProgress } from "../../context/ProgressContext";
 import { getUnits, getScenarios, PROFILES } from "../../data";
+import { DailyBulletin } from "../radar/DailyBulletin";
 
 function greeting() {
   const h = new Date().getHours();
@@ -37,6 +38,9 @@ export function Dashboard() {
         <StatCard icon={<Sparkles className="text-gold" />} label="Seviye" value={`Lv ${level.level} · ${level.title}`} />
         <StatCard icon={<span className="text-lg">📘</span>} label="Üniteler" value={`${completedUnits}/${totalUnits}`} />
       </div>
+
+      {/* Günün LV Bülteni */}
+      <DailyBulletin />
 
       {/* Devam et */}
       {nextUnit && (

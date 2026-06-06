@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { BookOpen, LayoutDashboard, LogOut, Sparkles, Theater, TrendingUp } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogOut, Radar, Sparkles, Theater, TrendingUp } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useProgress } from "../context/ProgressContext";
 import { PROFILES } from "../data";
@@ -10,6 +10,7 @@ const NAV = [
   { to: "/app", label: "Panel", icon: LayoutDashboard, end: true },
   { to: "/app/lessons", label: "Dersler", icon: BookOpen },
   { to: "/app/simulator", label: "Simülatör", icon: Theater },
+  { to: "/app/radar", label: "Radar", icon: Radar },
   { to: "/app/progress", label: "Gelişim", icon: TrendingUp },
 ];
 
