@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { BookOpen, LayoutDashboard, LogOut, Radar, RefreshCw, Settings, ShoppingBag, Sparkles, Theater, TrendingUp } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogOut, Radar, RefreshCw, Settings, ShoppingBag, Sparkles, Theater, TrendingUp, Layers } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useProgress } from "../context/ProgressContext";
 import { useMode } from "../context/ModeContext";
@@ -22,7 +22,7 @@ const NAV = [
 export function Layout() {
   const { user, signOut } = useAuth();
   const { level, completedUnits, totalUnits, progress, reviewsDue } = useProgress();
-  const { modeMeta } = useMode();
+  const { modeMeta, modeSelected } = useMode();
   const navigate = useNavigate();
   const [settingsOpen, setSettingsOpen] = useState(false);
   if (!user) return null;
@@ -52,10 +52,12 @@ export function Layout() {
             <p className="font-serif text-xl leading-tight text-espresso">{profile.name}</p>
             <p className="text-xs text-muted">{profile.role}</p>
             <button
+              type="button"
               onClick={() => navigate("/app/modes")}
-              className="mt-1 inline-flex items-center gap-1 rounded-full bg-cream px-2 py-0.5 text-[11px] font-semibold text-cognac hover:bg-cognac/10"
+              className="mt-1 inline-flex min-h-[32px] items-center gap-1 rounded-full bg-cream px-3 py-1 text-[11px] font-semibold text-cognac transition hover:bg-cognac/15"
+              aria-label="Mod değiştir"
             >
-              {modeMeta.emoji} {modeMeta.label} · {cefrLabel(cefr)}
+              {modeMeta.emoji} {modeMeta.label} · {cefrLabel(cefr)} ↻
             </button>
           </div>
         </div>
@@ -96,6 +98,14 @@ export function Layout() {
 
         <div className="mt-auto flex flex-col gap-1">
           <button
+            type="button"
+            onClick={() => navigate("/app/modes")}
+            className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-cognac transition hover:bg-cognac/10"
+          >
+            <Layers size={18} /> Mod değiştir
+            {modeSelected && <span className="ml-auto text-xs text-muted">{modeMeta.label}</span>}
+          </button>
+          <button
             onClick={() => setSettingsOpen(true)}
             className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm text-muted transition hover:bg-cream hover:text-ink"
           >
@@ -115,11 +125,21 @@ export function Layout() {
         className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-line bg-paper/85 px-4 py-3 backdrop-blur md:hidden"
         style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
       >
-        <div className="flex items-center gap-2 text-cognac">
-          <Sparkles size={16} />
-          <span className="font-serif text-lg">Tofta English Studio</span>
-        </div>
-        <div className="flex items-center gap-1">
+        <button
+          type="button"
+          onClick={() => navigate("/app/modes")}
+          className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left"
+          aria-label="Mod değiştir"
+        >
+          <span className="flex items-center gap-1.5 text-cognac">
+            <Sparkles size={16} />
+            <span className="font-serif text-lg leading-tight text-espresso">Tofta English</span>
+          </span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-cream px-2 py-0.5 text-[11px] font-semibold text-cognac">
+            {modeMeta.emoji} {modeMeta.label} · {cefrLabel(cefr)} ↻
+          </span>
+        </button>
+        <div className="flex shrink-0 items-center gap-1">
           <span className="chip text-xs">🔥 {progress?.streak ?? 0}</span>
           <button
             onClick={() => setSettingsOpen(true)}

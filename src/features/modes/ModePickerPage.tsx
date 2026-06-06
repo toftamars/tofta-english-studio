@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useMode } from "../../context/ModeContext";
 import { useProgress } from "../../context/ProgressContext";
@@ -12,7 +12,7 @@ import { cn } from "../../lib/cn";
 
 export function ModePickerPage() {
   const { user } = useAuth();
-  const { setMode, modes } = useMode();
+  const { setMode, modes, modeSelected, modeMeta } = useMode();
   const { progress } = useProgress();
   const navigate = useNavigate();
   if (!user) return null;
@@ -28,6 +28,16 @@ export function ModePickerPage() {
     <div className="relative min-h-screen px-4 py-10 md:px-8">
       <div className="grain" />
       <div className="relative z-10 mx-auto flex max-w-2xl flex-col gap-8">
+        {modeSelected && (
+          <button
+            type="button"
+            onClick={() => navigate("/app")}
+            className="inline-flex items-center gap-1 self-start text-sm font-medium text-muted transition hover:text-cognac"
+          >
+            <ArrowLeft size={16} /> Panele dön ({modeMeta.label})
+          </button>
+        )}
+
         <header className="text-center">
           <p className="eyebrow">Mod seç</p>
           <h1 className="font-display text-4xl text-espresso md:text-5xl">
@@ -49,7 +59,10 @@ export function ModePickerPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08 }}
                 onClick={() => pick(m.id)}
-                className="card-luxe group flex items-center gap-4 p-5 text-left transition hover:-translate-y-0.5"
+                className={cn(
+                  "card-luxe group flex items-center gap-4 p-5 text-left transition hover:-translate-y-0.5",
+                  modeSelected && modeMeta.id === m.id && "ring-2 ring-cognac/40",
+                )}
               >
                 <span
                   className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl text-2xl"
@@ -74,7 +87,9 @@ export function ModePickerPage() {
         </div>
 
         <p className="text-center text-xs text-muted">
-          Modu istediğin zaman panelden değiştirebilirsin.
+          {modeSelected
+            ? "Başka bir mod seç veya panele geri dön."
+            : "Modu istediğin zaman üst başlıktaki etikete veya menüden değiştirebilirsin."}
         </p>
       </div>
     </div>
