@@ -192,6 +192,67 @@ export function parseProductPaste(text: string): ParsedProduct {
   return out;
 }
 
+/** Toplu: yapıştırılan içerikteki TÜM ürün düğümlerini ayrıştırır. */
+export function parseAllProducts(text: string): ParsedProduct[] {
+  const raw = text.trim();
+  if (!raw) return [];
+  const nodes = collectProductNodes(raw);
+  const results: ParsedProduct[] = [];
+  const seen = new Set<string>();
+
+  for (const node of nodes) {
+    const p: ParsedProduct = {};
+    if (node.name) p.name = String(node.name);
+    if (node.description) p.summary = stripHtml(String(node.description)).slice(0, 400);
+    if (node.material) p.material = String(node.material);
+    if (node.sku) p.reference = String(node.sku);
+    const img = Array.isArray(node.image) ? node.image[0] : node.image;
+    if (img) p.imageUrl = String(img);
+    const offers = Array.isArray(node.offers) ? node.offers[0] : node.offers;
+    if (offers?.price) p.priceText = `${offers.price}${offers.priceCurrency ? " " + offers.priceCurrency : ""}`.trim();
+    if (node.url) p.url = String(node.url);
+    const key = (p.name || "") + (p.reference || "");
+    if (p.name && !seen.has(key)) {
+      seen.add(key);
+      results.push(p);
+    }
+  }
+
+  // Hiç JSON-LD yoksa en azından tek bir ürünü dene
+  if (results.length === 0) {
+    const single = parseProductPaste(raw);
+    if (single.name) results.push(single);
+  }
+  return results;
+}
+
+function collectProductNodes(raw: string): any[] {
+  const blocks: string[] = [];
+  const scriptRe = /<script[^>]*application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi;
+  let m: RegExpExecArray | null;
+  while ((m = scriptRe.exec(raw))) blocks.push(m[1]);
+  if (raw.startsWith("{") || raw.startsWith("[")) blocks.push(raw);
+
+  const out: any[] = [];
+  const walk = (node: any) => {
+    if (!node || typeof node !== "object") return;
+    const type = node["@type"];
+    if (type === "Product" || (Array.isArray(type) && type.includes("Product"))) out.push(node);
+    if (Array.isArray(node)) node.forEach(walk);
+    for (const key of ["@graph", "itemListElement", "mainEntity", "item"]) {
+      if (node[key]) walk(node[key]);
+    }
+  };
+  for (const b of blocks) {
+    try {
+      walk(JSON.parse(b.trim()));
+    } catch {
+      /* sıradakine geç */
+    }
+  }
+  return out;
+}
+
 function stripHtml(s: string): string {
   return s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }

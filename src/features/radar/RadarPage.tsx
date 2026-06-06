@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { ExternalLink, Plus, Radar, Trash2 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, ExternalLink, Languages, Plus, Radar, Trash2 } from "lucide-react";
 import type { RadarItem, RadarNote, RadarNoteCategory } from "../../types";
 import { getWordOfDay } from "../../data/radar";
 import { loadRadar, timeAgoTr } from "../../lib/radar";
 import { addNote, deleteNote, listNotes, type NewNoteInput } from "../../lib/radarNotes";
+import { translateToTr } from "../../lib/translate";
 import { useAuth } from "../../context/AuthContext";
 import { SpeakButton } from "../../components/ui/SpeakButton";
 import { cn } from "../../lib/cn";
@@ -85,31 +86,11 @@ export function RadarPage() {
         </div>
         <div className="grid gap-3">
           {news.map((n, i) => (
-            <motion.a
-              key={`${n.url}-${i}`}
-              href={n.url}
-              target="_blank"
-              rel="noreferrer"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.03 * i }}
-              className="card-luxe group flex items-start gap-3 p-4 transition hover:-translate-y-0.5"
-            >
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-cream text-lg">📰</span>
-              <span className="min-w-0 flex-1">
-                <span className="mb-0.5 flex flex-wrap items-center gap-2">
-                  {n.tag && <span className="rounded-full bg-cognac/12 px-2 py-0.5 text-[11px] font-semibold text-cognac">{n.tag}</span>}
-                  <span className="text-xs text-muted">{n.source} · {timeAgoTr(n.publishedAt)}</span>
-                </span>
-                <span className="block font-medium leading-snug text-espresso group-hover:text-cognac">{n.title}</span>
-                {n.summary && <span className="mt-1 line-clamp-2 block text-sm text-muted">{n.summary}</span>}
-              </span>
-              <ExternalLink size={15} className="mt-1 shrink-0 text-muted group-hover:text-cognac" />
-            </motion.a>
+            <NewsItem key={`${n.url}-${i}`} item={n} index={i} />
           ))}
         </div>
         <p className="text-xs text-muted">
-          Haberler halka açık RSS kaynaklarından her gün otomatik güncellenir.
+          Haberler halka açık RSS kaynaklarından her gün otomatik güncellenir. Çeviri istediğinde cihazında yapılır.
         </p>
       </section>
 
@@ -167,6 +148,102 @@ export function RadarPage() {
         )}
       </section>
     </div>
+  );
+}
+
+function NewsItem({ item, index }: { item: RadarItem; index: number }) {
+  const [open, setOpen] = useState(false);
+  const [tr, setTr] = useState<string | null>(null);
+  const [trState, setTrState] = useState<"idle" | "loading" | "done" | "error">("idle");
+
+  async function handleTranslate() {
+    if (trState === "loading") return;
+    if (tr) {
+      setTrState("done");
+      return;
+    }
+    setTrState("loading");
+    const result = await translateToTr(item.title);
+    if (result) {
+      setTr(result);
+      setTrState("done");
+    } else {
+      setTrState("error");
+    }
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.03 * index }}
+      className="card-luxe overflow-hidden"
+    >
+      <button onClick={() => setOpen((o) => !o)} className="flex w-full items-start gap-3 p-4 text-left">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-cream text-lg">📰</span>
+        <span className="min-w-0 flex-1">
+          <span className="mb-0.5 flex flex-wrap items-center gap-2">
+            {item.tag && (
+              <span className="rounded-full bg-cognac/12 px-2 py-0.5 text-[11px] font-semibold text-cognac">{item.tag}</span>
+            )}
+            <span className="text-xs text-muted">
+              {item.source} · {timeAgoTr(item.publishedAt)}
+            </span>
+          </span>
+          <span className="block font-medium leading-snug text-espresso">{item.title}</span>
+        </span>
+        <ChevronDown
+          size={18}
+          className={cn("mt-1 shrink-0 text-muted transition-transform", open && "rotate-180")}
+        />
+      </button>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden border-t border-line"
+          >
+            <div className="flex flex-col gap-3 p-4">
+              <div>
+                <p className="text-[11px] uppercase tracking-wider text-muted">Orijinal (EN)</p>
+                <p className="text-sm text-ink/85">{item.title}</p>
+              </div>
+
+              {trState === "done" && tr && (
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-muted">Türkçe</p>
+                  <p className="text-sm text-espresso">{tr}</p>
+                </div>
+              )}
+              {trState === "error" && (
+                <p className="text-xs text-cognac">Çeviri şu an yapılamadı, birazdan tekrar dene.</p>
+              )}
+
+              <div className="flex flex-wrap items-center gap-2">
+                <button onClick={handleTranslate} className="btn-ghost !px-3 !py-1.5 text-sm">
+                  <Languages size={15} />
+                  {trState === "loading" ? "Çevriliyor…" : tr ? "Türkçeyi göster" : "Türkçe'ye çevir"}
+                </button>
+                <SpeakButton text={item.title} label="Dinle" className="!px-3 !py-1.5" />
+                {item.url && (
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-sm font-semibold text-cognac hover:underline"
+                  >
+                    Kaynakta aç <ExternalLink size={13} />
+                  </a>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
 

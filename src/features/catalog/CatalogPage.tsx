@@ -6,9 +6,11 @@ import {
   addProduct,
   deleteProduct,
   listProducts,
+  parseAllProducts,
   parseProductPaste,
   type NewProductInput,
 } from "../../lib/products";
+import type { ParsedProduct } from "../../types";
 import { useAuth } from "../../context/AuthContext";
 import { SpeakButton } from "../../components/ui/SpeakButton";
 import { cn } from "../../lib/cn";
@@ -20,6 +22,7 @@ export function CatalogPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [showBulk, setShowBulk] = useState(false);
 
   useEffect(() => {
     listProducts()
@@ -27,10 +30,35 @@ export function CatalogPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const author = user ? { id: user.id, displayName: user.displayName } : undefined;
+
   async function handleAdd(input: NewProductInput) {
-    const p = await addProduct(input, user ? { id: user.id, displayName: user.displayName } : undefined);
+    const p = await addProduct(input, author);
     setProducts((prev) => [p, ...prev]);
     setShowForm(false);
+  }
+
+  async function handleBulkAdd(items: ParsedProduct[]) {
+    const added: Product[] = [];
+    for (const it of items) {
+      if (!it.name) continue;
+      const p = await addProduct(
+        {
+          name: it.name,
+          category: "Diğer",
+          material: it.material,
+          priceText: it.priceText,
+          reference: it.reference,
+          summary: it.summary,
+          imageUrl: it.imageUrl,
+          url: it.url,
+        },
+        author,
+      );
+      added.push(p);
+    }
+    setProducts((prev) => [...added, ...prev]);
+    setShowBulk(false);
   }
   async function handleDelete(id: string) {
     await deleteProduct(id);
@@ -49,14 +77,20 @@ export function CatalogPage() {
         </p>
       </header>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-sm text-muted">{products.length} ürün</span>
-        <button onClick={() => setShowForm((s) => !s)} className="btn-primary !px-4 !py-2 text-sm">
-          <Plus size={16} /> Ürün ekle
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => { setShowBulk((s) => !s); setShowForm(false); }} className="btn-ghost !px-4 !py-2 text-sm">
+            Toplu ekle
+          </button>
+          <button onClick={() => { setShowForm((s) => !s); setShowBulk(false); }} className="btn-primary !px-4 !py-2 text-sm">
+            <Plus size={16} /> Ürün ekle
+          </button>
+        </div>
       </div>
 
       {showForm && <ProductForm onSubmit={handleAdd} onCancel={() => setShowForm(false)} />}
+      {showBulk && <BulkForm onSubmit={handleBulkAdd} onCancel={() => setShowBulk(false)} />}
 
       {loading ? (
         <p className="animate-pulse text-sm text-muted">Ürünler yükleniyor…</p>
@@ -137,6 +171,66 @@ function Row({ k, v }: { k: string; v: string }) {
       <dt className="w-16 shrink-0 text-muted">{k}</dt>
       <dd className="font-medium text-espresso">{v}</dd>
     </div>
+  );
+}
+
+function BulkForm({
+  onSubmit,
+  onCancel,
+}: {
+  onSubmit: (items: ParsedProduct[]) => void;
+  onCancel: () => void;
+}) {
+  const [paste, setPaste] = useState("");
+  const [items, setItems] = useState<ParsedProduct[]>([]);
+  const [scanned, setScanned] = useState(false);
+  const inputCls = "w-full rounded-2xl border border-line bg-paper px-4 py-3 text-sm outline-none focus:border-cognac";
+
+  function handleScan() {
+    const r = parseAllProducts(paste);
+    setItems(r);
+    setScanned(true);
+  }
+
+  return (
+    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="card-luxe flex flex-col gap-3 p-4">
+      <p className="flex items-center gap-2 text-xs font-semibold text-cognac">
+        <Sparkles size={14} /> Toplu ekle: bir ürün listesi sayfasının metnini (JSON-LD dahil) yapıştır
+      </p>
+      <textarea
+        value={paste}
+        onChange={(e) => setPaste(e.target.value)}
+        placeholder="Ürün listesi / kategori sayfasından kopyaladığın içeriği yapıştır…"
+        rows={5}
+        className={inputCls}
+      />
+      <div className="flex items-center gap-2">
+        <button type="button" onClick={handleScan} disabled={!paste.trim()} className="btn-ghost !px-4 !py-2 text-sm">
+          Tara
+        </button>
+        {scanned && <span className="text-xs text-muted">{items.length} ürün bulundu</span>}
+      </div>
+
+      {items.length > 0 && (
+        <ul className="flex flex-col gap-1.5 rounded-2xl bg-cream/60 p-3 text-sm">
+          {items.slice(0, 30).map((it, i) => (
+            <li key={i} className="flex items-center justify-between gap-2">
+              <span className="truncate text-espresso">{it.name}</span>
+              {it.priceText && <span className="shrink-0 text-xs text-muted">{it.priceText}</span>}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="flex gap-2">
+        <button type="button" onClick={() => onSubmit(items)} disabled={items.length === 0} className="btn-primary disabled:opacity-40">
+          Hepsini ekle ({items.length})
+        </button>
+        <button type="button" onClick={onCancel} className="btn-ghost">
+          Vazgeç
+        </button>
+      </div>
+    </motion.div>
   );
 }
 

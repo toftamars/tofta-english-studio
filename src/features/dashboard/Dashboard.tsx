@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useProgress } from "../../context/ProgressContext";
 import { getUnits, getScenarios, PROFILES } from "../../data";
 import { DailyBulletin } from "../radar/DailyBulletin";
+import { StudyDeck } from "../study/StudyDeck";
 
 function greeting() {
   const h = new Date().getHours();
@@ -41,6 +42,9 @@ export function Dashboard() {
 
       {/* Günün LV Bülteni */}
       <DailyBulletin />
+
+      {/* Otomatik çalışma kartları (ürün + insider not) */}
+      <StudyDeck />
 
       {/* Devam et */}
       {nextUnit && (

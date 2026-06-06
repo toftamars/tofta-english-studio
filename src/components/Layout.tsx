@@ -22,11 +22,17 @@ export function Layout() {
   if (!user) return null;
   const profile = PROFILES[user.profileId];
 
+  async function handleSignOut() {
+    await signOut();
+    navigate("/");
+  }
+
   return (
     <div className="relative min-h-screen md:grid md:grid-cols-[290px_1fr]">
       <div className="grain" />
 
-      <aside className="z-10 flex flex-col gap-6 border-b border-line bg-paper/80 p-5 backdrop-blur md:sticky md:top-0 md:h-screen md:overflow-y-auto md:border-b-0 md:border-r">
+      {/* Masaüstü kenar çubuğu */}
+      <aside className="z-10 hidden flex-col gap-6 border-line bg-paper/80 p-5 backdrop-blur md:sticky md:top-0 md:flex md:h-screen md:overflow-y-auto md:border-r">
         <div className="flex items-center gap-3">
           <div
             className="grid h-12 w-12 place-items-center rounded-full font-serif text-2xl text-white"
@@ -54,7 +60,7 @@ export function Layout() {
           </div>
         </div>
 
-        <nav className="flex gap-2 md:flex-col">
+        <nav className="flex flex-col gap-2">
           {NAV.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
@@ -62,35 +68,69 @@ export function Layout() {
               end={end}
               className={({ isActive }) =>
                 cn(
-                  "flex flex-1 items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition md:flex-none",
+                  "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition",
                   isActive ? "bg-espresso text-ivory shadow-soft" : "text-ink hover:bg-cream",
                 )
               }
             >
               <Icon size={18} />
-              <span className="hidden md:inline">{label}</span>
+              <span>{label}</span>
             </NavLink>
           ))}
         </nav>
 
         <button
-          onClick={async () => {
-            await signOut();
-            navigate("/");
-          }}
-          className="mt-auto hidden items-center gap-2 rounded-2xl px-4 py-3 text-sm text-muted transition hover:bg-cream hover:text-ink md:flex"
+          onClick={handleSignOut}
+          className="mt-auto flex items-center gap-2 rounded-2xl px-4 py-3 text-sm text-muted transition hover:bg-cream hover:text-ink"
         >
           <LogOut size={18} /> Çıkış
         </button>
       </aside>
 
-      <main className="z-10 mx-auto w-full max-w-4xl px-4 py-8 md:px-10">
-        <div className="mb-6 flex items-center gap-2 text-cognac md:hidden">
+      {/* Mobil üst başlık (ince) */}
+      <header
+        className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-line bg-paper/85 px-4 py-3 backdrop-blur md:hidden"
+        style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
+      >
+        <div className="flex items-center gap-2 text-cognac">
           <Sparkles size={16} />
           <span className="font-serif text-lg">Tofta English Studio</span>
         </div>
+        <div className="flex items-center gap-2">
+          <span className="chip text-xs">🔥 {progress?.streak ?? 0}</span>
+          <span className="chip text-xs">Lv {level.level}</span>
+          <button onClick={handleSignOut} className="text-muted transition hover:text-cognac" aria-label="Çıkış">
+            <LogOut size={18} />
+          </button>
+        </div>
+      </header>
+
+      <main className="z-10 mx-auto w-full max-w-4xl px-4 py-6 pb-28 md:px-10 md:py-8 md:pb-10">
         <Outlet />
       </main>
+
+      {/* Mobil alt navigasyon barı (safe-area) */}
+      <nav
+        className="fixed inset-x-0 bottom-0 z-30 flex items-stretch border-t border-line bg-paper/95 backdrop-blur md:hidden"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        {NAV.map(({ to, label, icon: Icon, end }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={end}
+            className={({ isActive }) =>
+              cn(
+                "flex flex-1 flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium transition",
+                isActive ? "text-cognac" : "text-muted hover:text-ink",
+              )
+            }
+          >
+            <Icon size={20} />
+            <span className="leading-none">{label}</span>
+          </NavLink>
+        ))}
+      </nav>
     </div>
   );
 }

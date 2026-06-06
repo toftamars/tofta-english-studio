@@ -214,3 +214,21 @@ export type ProductCategory =
 export type ParsedProduct = Partial<
   Pick<Product, "name" | "material" | "priceText" | "reference" | "summary" | "imageUrl" | "url">
 >;
+
+// ---------------- Otomatik Çalışma Kartları ----------------
+
+export type StudyCardKind = "flashcard" | "quiz" | "dialogue";
+
+/** Ürün/insider nottan otomatik üretilen çalışma kartı (şablon tabanlı, deterministik). */
+export interface StudyCard {
+  id: string;
+  kind: StudyCardKind;
+  source: "product" | "note";
+  topic: string; // kaynağın adı (ürün adı / not başlığı)
+  front: string; // ön yüz: EN ifade / soru / istem
+  back: string; // arka yüz: TR / açıklama / cevap
+  speak?: string; // sesli okunacak EN metin
+  options?: string[]; // quiz şıkları
+  answerIndex?: number; // quiz doğru şık
+  dialogue?: { speaker: string; text: string }[]; // diyalog satırları
+}
