@@ -85,10 +85,28 @@ npm run preview    # derlemeyi önizle
 3. Yerelde: `.env.example` dosyasını `.env` olarak kopyala ve değerleri gir.
 4. Yayında: GitHub repo → `Settings → Secrets and variables → Actions` →
    `VITE_SUPABASE_URL` ve `VITE_SUPABASE_ANON_KEY` secret'larını ekle.
-5. Veritabanı tablosu (`progress`) ve RLS politikaları proje hazır olduğunda
-   otomatik kurulur.
+5. Tablolar (`progress`, `radar_notes`, `products`) ve `product-photos` deposu
+   kuruludur. RLS açıktır ve **sahibine kilitlidir**: `progress` yalnızca sahibine
+   görünür; `radar_notes`/`products` ortak okunur ama yalnızca ekleyen kişi
+   düzenleyebilir/silebilir.
 
 Bu değerler tanımlı değilse uygulama otomatik olarak **yerel modda** çalışır.
+
+---
+
+## 🔒 Güvenlik notu (bulut mod)
+
+Davet kodu (`TOFTA2026`) istemci tarafındadır; tek başına yeterli koruma değildir.
+İki kişilik kapalı bir kullanım için Supabase panelinde:
+
+1. **Açık kaydı kapat:** `Authentication → Sign In / Providers → Email` altında
+   *"Allow new users to sign up"* seçeneğini kapat. (Hesaplar bir kez kurulduğu için
+   yeni kayda gerek yok; bu, yabancı erişimini tamamen engeller.)
+2. **Sızdırılmış parola korumasını aç:** `Authentication → Policies / Password` →
+   *Leaked password protection* (HaveIBeenPwned kontrolü).
+
+RLS sahibine kilitli olduğu için bu ayarlar açık olmasa bile kimse diğerinin
+ilerlemesini göremez; bu adımlar son güvenlik kilidini ekler.
 
 ---
 
