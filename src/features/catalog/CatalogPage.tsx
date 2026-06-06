@@ -1,0 +1,278 @@
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { ExternalLink, Plus, ShoppingBag, Sparkles, Trash2 } from "lucide-react";
+import type { Product, ProductCategory } from "../../types";
+import {
+  addProduct,
+  deleteProduct,
+  listProducts,
+  parseProductPaste,
+  type NewProductInput,
+} from "../../lib/products";
+import { useAuth } from "../../context/AuthContext";
+import { SpeakButton } from "../../components/ui/SpeakButton";
+import { cn } from "../../lib/cn";
+
+const CATEGORIES: ProductCategory[] = ["Çanta", "Küçük Deri", "Aksesuar", "Ayakkabı", "Hazır Giyim", "Parfüm", "Diğer"];
+
+export function CatalogPage() {
+  const { user } = useAuth();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    listProducts()
+      .then(setProducts)
+      .finally(() => setLoading(false));
+  }, []);
+
+  async function handleAdd(input: NewProductInput) {
+    const p = await addProduct(input, user ? { id: user.id, displayName: user.displayName } : undefined);
+    setProducts((prev) => [p, ...prev]);
+    setShowForm(false);
+  }
+  async function handleDelete(id: string) {
+    await deleteProduct(id);
+    setProducts((prev) => prev.filter((p) => p.id !== id));
+  }
+
+  return (
+    <div className="flex flex-col gap-7">
+      <header>
+        <p className="eyebrow flex items-center gap-2">
+          <ShoppingBag size={14} /> Ürün Kataloğu · Hep güncel
+        </p>
+        <h1 className="font-display text-4xl text-espresso md:text-5xl">Katalog</h1>
+        <p className="text-muted">
+          Gördüğün gerçek ürünleri ekle; isim, malzeme ve fiyatı hem İngilizce öğren hem satışta kullan.
+        </p>
+      </header>
+
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-muted">{products.length} ürün</span>
+        <button onClick={() => setShowForm((s) => !s)} className="btn-primary !px-4 !py-2 text-sm">
+          <Plus size={16} /> Ürün ekle
+        </button>
+      </div>
+
+      {showForm && <ProductForm onSubmit={handleAdd} onCancel={() => setShowForm(false)} />}
+
+      {loading ? (
+        <p className="animate-pulse text-sm text-muted">Ürünler yükleniyor…</p>
+      ) : products.length === 0 ? (
+        <div className="card-luxe p-6 text-center text-sm text-muted">
+          Henüz ürün yok. Bir ürün sayfasının bilgisini yapıştırarak başla ✨
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {products.map((p, i) => (
+            <ProductCard key={p.id} p={p} index={i} onDelete={() => handleDelete(p.id)} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ProductCard({ p, index, onDelete }: { p: Product; index: number; onDelete: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.03 * index }}
+      className="card-luxe flex flex-col overflow-hidden"
+    >
+      {p.imageUrl && (
+        <div className="aspect-[4/3] w-full overflow-hidden bg-cream">
+          <img src={p.imageUrl} alt={p.name} loading="lazy" className="h-full w-full object-cover" />
+        </div>
+      )}
+      <div className="flex flex-1 flex-col gap-2 p-4">
+        <div className="flex items-start justify-between gap-2">
+          <span className="rounded-full bg-cognac/12 px-2.5 py-0.5 text-[11px] font-semibold text-cognac">
+            {p.category}
+          </span>
+          <button onClick={onDelete} className="text-muted transition hover:text-cognac" aria-label="Sil">
+            <Trash2 size={15} />
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <p className="font-serif text-xl leading-tight text-espresso">{p.name}</p>
+          <SpeakButton text={p.name} label="" className="!px-2 !py-1" />
+        </div>
+        {p.line && <p className="-mt-1 text-xs uppercase tracking-wide text-muted">{p.line}</p>}
+
+        <dl className="mt-1 grid grid-cols-1 gap-1 text-sm">
+          {p.material && <Row k="Malzeme" v={p.material} />}
+          {p.priceText && <Row k="Fiyat" v={p.priceText} />}
+          {p.origin && <Row k="Menşe" v={p.origin} />}
+          {p.reference && <Row k="Ref" v={p.reference} />}
+        </dl>
+
+        {p.summary && <p className="mt-1 text-sm text-ink/80">{p.summary}</p>}
+
+        <div className="mt-auto flex items-center justify-between pt-2">
+          <span className="text-xs text-muted">{p.authorName ?? ""}</span>
+          {p.url && (
+            <a
+              href={p.url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-cognac hover:underline"
+            >
+              Kaynak <ExternalLink size={12} />
+            </a>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function Row({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="flex gap-2">
+      <dt className="w-16 shrink-0 text-muted">{k}</dt>
+      <dd className="font-medium text-espresso">{v}</dd>
+    </div>
+  );
+}
+
+function ProductForm({
+  onSubmit,
+  onCancel,
+}: {
+  onSubmit: (input: NewProductInput) => void;
+  onCancel: () => void;
+}) {
+  const [paste, setPaste] = useState("");
+  const [name, setName] = useState("");
+  const [line, setLine] = useState("");
+  const [category, setCategory] = useState<ProductCategory>("Çanta");
+  const [material, setMaterial] = useState("");
+  const [priceText, setPriceText] = useState("");
+  const [reference, setReference] = useState("");
+  const [origin, setOrigin] = useState("");
+  const [summary, setSummary] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [url, setUrl] = useState("");
+  const [parsedMsg, setParsedMsg] = useState("");
+
+  const valid = name.trim().length > 1;
+
+  function handleParse() {
+    const r = parseProductPaste(paste);
+    const filled: string[] = [];
+    if (r.name) {
+      setName(r.name);
+      filled.push("isim");
+    }
+    if (r.material) {
+      setMaterial(r.material);
+      filled.push("malzeme");
+    }
+    if (r.priceText) {
+      setPriceText(r.priceText);
+      filled.push("fiyat");
+    }
+    if (r.reference) {
+      setReference(r.reference);
+      filled.push("ref");
+    }
+    if (r.summary) {
+      setSummary(r.summary);
+      filled.push("özet");
+    }
+    if (r.imageUrl) {
+      setImageUrl(r.imageUrl);
+      filled.push("görsel");
+    }
+    if (r.url) {
+      setUrl(r.url);
+      filled.push("link");
+    }
+    setParsedMsg(
+      filled.length ? `Ayrıştırıldı: ${filled.join(", ")}. Kontrol edip kaydet.` : "Otomatik alan bulunamadı; elle doldurabilirsin.",
+    );
+  }
+
+  const inputCls = "w-full rounded-2xl border border-line bg-paper px-4 py-3 text-sm outline-none focus:border-cognac";
+
+  return (
+    <motion.form
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (valid)
+          onSubmit({ name, line, category, material, priceText, reference, origin, summary, imageUrl, url });
+      }}
+      className="card-luxe flex flex-col gap-3 p-4"
+    >
+      {/* Yapıştır-ayrıştır */}
+      <div className="rounded-2xl bg-cream/60 p-3">
+        <p className="mb-2 flex items-center gap-2 text-xs font-semibold text-cognac">
+          <Sparkles size={14} /> Hızlı ekle: ürün sayfasının metnini / linkini yapıştır
+        </p>
+        <textarea
+          value={paste}
+          onChange={(e) => setPaste(e.target.value)}
+          placeholder="Ürün sayfasından kopyaladığın metni veya linki buraya yapıştır…"
+          rows={3}
+          className={inputCls}
+        />
+        <div className="mt-2 flex items-center gap-2">
+          <button type="button" onClick={handleParse} className="btn-ghost !px-4 !py-2 text-sm" disabled={!paste.trim()}>
+            Ayrıştır
+          </button>
+          {parsedMsg && <span className="text-xs text-muted">{parsedMsg}</span>}
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {CATEGORIES.map((c) => (
+          <button
+            key={c}
+            type="button"
+            onClick={() => setCategory(c)}
+            className={cn(
+              "rounded-full px-3 py-1.5 text-xs font-semibold transition",
+              category === c ? "bg-espresso text-ivory" : "bg-cream text-ink hover:bg-cognac/10",
+            )}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
+
+      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="İsim * (ör. Low Key Hobo PM)" className={inputCls} />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <input value={line} onChange={(e) => setLine(e.target.value)} placeholder="Hat (ör. Speedy)" className={inputCls} />
+        <input value={material} onChange={(e) => setMaterial(e.target.value)} placeholder="Malzeme (ör. Monogram canvas)" className={inputCls} />
+        <input value={priceText} onChange={(e) => setPriceText(e.target.value)} placeholder="Fiyat (ör. ≈ 2.500 €)" className={inputCls} />
+        <input value={reference} onChange={(e) => setReference(e.target.value)} placeholder="Ref (ör. M29068)" className={inputCls} />
+        <input value={origin} onChange={(e) => setOrigin(e.target.value)} placeholder="Menşe (ör. France)" className={inputCls} />
+        <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="Görsel linki (opsiyonel)" className={inputCls} />
+      </div>
+      <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Ürün sayfası linki (opsiyonel)" className={inputCls} />
+      <textarea
+        value={summary}
+        onChange={(e) => setSummary(e.target.value)}
+        placeholder="Kendi kısa özetin (telifsiz): öne çıkan özellikler, satış notu…"
+        rows={3}
+        className={inputCls}
+      />
+
+      <div className="flex gap-2">
+        <button type="submit" disabled={!valid} className="btn-primary disabled:opacity-40">
+          Kaydet
+        </button>
+        <button type="button" onClick={onCancel} className="btn-ghost">
+          Vazgeç
+        </button>
+      </div>
+    </motion.form>
+  );
+}

@@ -9,6 +9,7 @@ import { SimulatorList } from "./features/simulator/SimulatorList";
 import { SimulatorPlay } from "./features/simulator/SimulatorPlay";
 import { ProgressPage } from "./features/progress/ProgressPage";
 import { RadarPage } from "./features/radar/RadarPage";
+import { CatalogPage } from "./features/catalog/CatalogPage";
 
 function Protected({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="simulator" element={<SimulatorList />} />
         <Route path="simulator/:slug" element={<SimulatorPlay />} />
         <Route path="radar" element={<RadarPage />} />
+        <Route path="catalog" element={<CatalogPage />} />
         <Route path="progress" element={<ProgressPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

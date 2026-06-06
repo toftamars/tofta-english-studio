@@ -177,3 +177,40 @@ export interface WordOfDay {
   tr: string;
   note: string; // LV bağlamında neden önemli
 }
+
+// ---------------- Ürün Kataloğu ----------------
+
+/**
+ * Ürün kartı — kullanıcı (tüketici olarak) gördüğü bilgiyi elle ya da
+ * "yapıştır-ayrıştır" ile ekler. Görsel yalnızca LİNK olarak tutulur
+ * (telif açısından temiz). Uygulama otomatik istek atmaz.
+ */
+export interface Product {
+  id: string;
+  name: string;
+  line?: string; // hat: Speedy / Capucines / Neverfull …
+  category?: ProductCategory;
+  material?: string;
+  priceText?: string; // serbest metin: "≈ 2.500 €"
+  reference?: string; // ör. M29068
+  origin?: string; // menşe: France / Italy / Spain …
+  summary?: string; // kullanıcının kendi kısa özeti (telif yok)
+  imageUrl?: string; // sadece link
+  url?: string; // ürün sayfası linki
+  authorName?: string;
+  createdAt: string;
+}
+
+export type ProductCategory =
+  | "Çanta"
+  | "Küçük Deri"
+  | "Aksesuar"
+  | "Ayakkabı"
+  | "Hazır Giyim"
+  | "Parfüm"
+  | "Diğer";
+
+/** Yapıştır-ayrıştır sonucu (kısmi alanlar). */
+export type ParsedProduct = Partial<
+  Pick<Product, "name" | "material" | "priceText" | "reference" | "summary" | "imageUrl" | "url">
+>;
