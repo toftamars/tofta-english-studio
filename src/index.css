@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-ivory text-ink font-sans antialiased;
+    background-image:
+      radial-gradient(120% 90% at 50% -10%, #fbf6ec 0%, #f6f1e7 45%, #efe6d6 100%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    @apply bg-cognac/20;
+  }
+}
+
+@layer components {
+  .grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+  }
+
+  .card-luxe {
+    @apply rounded-3xl border border-line bg-paper shadow-luxe;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 font-medium transition-all active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply btn bg-cognac text-white hover:bg-cognacDeep shadow-soft;
+  }
+  .btn-ghost {
+    @apply btn border border-line bg-paper text-ink hover:border-cognac;
+  }
+  .btn-gold {
+    @apply btn bg-gradient-to-br from-gold to-cognac text-white shadow-soft;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-paper px-3 py-1 text-sm;
+  }
+
+  .eyebrow {
+    @apply text-xs uppercase tracking-[0.28em] text-cognac font-semibold;
+  }
+}
+
+/* özel kaydırma çubuğu */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d8c8b0;
+  border-radius: 999px;
+  border: 2px solid #f6f1e7;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c9b394;
+}

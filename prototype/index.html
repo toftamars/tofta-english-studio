@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tofta English Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ============ PROFİL SEÇİM EKRANI ============ -->
+  <section id="profile-screen" class="screen profile-screen">
+    <div class="grain"></div>
+    <header class="welcome">
+      <p class="eyebrow">Tofta Ailesine Özel</p>
+      <h1 class="brand">English<span>Studio</span></h1>
+      <p class="tagline">Günde 15 dakika. İşinize özel İngilizce.</p>
+    </header>
+
+    <div class="profile-cards">
+      <button class="profile-card" data-profile="alper">
+        <span class="profile-initial">A</span>
+        <span class="profile-name">Alper</span>
+        <span class="profile-role">Mağaza Müdürü · Zuhal Müzik</span>
+        <span class="profile-go">Çalışmaya başla →</span>
+      </button>
+
+      <button class="profile-card hulya" data-profile="hulya">
+        <span class="profile-initial">H</span>
+        <span class="profile-name">Hülya</span>
+        <span class="profile-role">Luxury Retail · Louis Vuitton</span>
+        <span class="profile-go">Çalışmaya başla →</span>
+      </button>
+    </div>
+
+    <footer class="profile-footer">
+      <p>Seviye: A2 · 10 Ünite · 5 Beceri</p>
+    </footer>
+  </section>
+
+  <!-- ============ ANA UYGULAMA ============ -->
+  <main id="app-screen" class="screen app-screen hidden">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <button id="back-to-profiles" class="back-btn" title="Profil değiştir">←</button>
+        <div class="current-profile">
+          <span id="side-initial" class="side-initial">A</span>
+          <div>
+            <strong id="side-name">Alper</strong>
+            <small id="side-role">Mağaza Müdürü</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-block">
+        <div class="progress-ring-wrap">
+          <svg viewBox="0 0 120 120" class="progress-ring">
+            <circle class="ring-bg" cx="60" cy="60" r="52" />
+            <circle id="ring-fill" class="ring-fill" cx="60" cy="60" r="52" />
+          </svg>
+          <div class="progress-center">
+            <strong id="progress-percent">0%</strong>
+            <small>tamamlandı</small>
+          </div>
+        </div>
+        <div class="streak">
+          <span id="streak-count">0</span> günlük seri
+        </div>
+      </div>
+
+      <nav id="unit-nav" class="unit-nav"></nav>
+    </aside>
+
+    <section class="content">
+      <div id="lesson-view"></div>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
