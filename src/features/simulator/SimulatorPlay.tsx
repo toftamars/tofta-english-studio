@@ -1,14 +1,20 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, PartyPopper } from "lucide-react";
+import { ArrowLeft, Mic, PartyPopper } from "lucide-react";
 import { getScenario } from "../../data";
 import { useProgress } from "../../context/ProgressContext";
-import type { ReplyOption } from "../../types";
+import type { DialogueStep, ReplyOption } from "../../types";
 import { SpeakButton } from "../../components/ui/SpeakButton";
 import { MicButton } from "../../components/ui/MicButton";
-import { speak, cancelSpeech } from "../../lib/speech";
+import { createRecognizer, isRecognitionSupported, pronunciationScore, speak, cancelSpeech } from "../../lib/speech";
 import { cn } from "../../lib/cn";
+
+interface HeardResult {
+  text: string;
+  matchedIdx: number;
+  score: number;
+}
 
 export function SimulatorPlay() {
   const { slug } = useParams();
@@ -18,25 +24,114 @@ export function SimulatorPlay() {
   const [stepIdx, setStepIdx] = useState(0);
   const [choices, setChoices] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
+  const [voiceMode, setVoiceMode] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [heard, setHeard] = useState<HeardResult | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const recRef = useRef<ReturnType<typeof createRecognizer> | null>(null);
+  const recSupported = isRecognitionSupported();
+
+  const stopListening = useCallback(() => {
+    try {
+      recRef.current?.stop();
+    } catch {
+      /* yoksay */
+    }
+    recRef.current = null;
+    setListening(false);
+  }, []);
 
   useEffect(() => {
     setStepIdx(0);
     setChoices({});
     setFinished(false);
+    setHeard(null);
     window.scrollTo(0, 0);
-    return () => cancelSpeech();
-  }, [slug]);
+    return () => {
+      cancelSpeech();
+      stopListening();
+    };
+  }, [slug, stopListening]);
 
-  // En son konuşma satırını otomatik seslendir
+  // Mevcut adım için: seslendir; sesli modda bitince dinlemeye geç
   useEffect(() => {
     const step = scenario?.steps[stepIdx];
-    if (step && step.speaker !== "narrator") speak(step.en);
-  }, [stepIdx, scenario]);
+    if (!step || finished) return;
+    setHeard(null);
+
+    if (step.speaker === "narrator") {
+      if (voiceMode) {
+        const t = setTimeout(() => setStepIdx((s) => Math.min(s + 1, scenario.steps.length - 1)), 1100);
+        return () => clearTimeout(t);
+      }
+      return;
+    }
+
+    speak(step.en, {
+      onEnd: () => {
+        if (voiceMode && step.replies?.length && choices[stepIdx] === undefined) {
+          beginListening(step);
+        }
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepIdx, scenario, voiceMode]);
+
+  function beginListening(step: DialogueStep) {
+    if (!recSupported) return;
+    const rec = createRecognizer();
+    if (!rec) return;
+    recRef.current = rec;
+    setListening(true);
+    rec.onresult = (e) => {
+      const text = e.results[0][0].transcript;
+      const replies = step.replies ?? [];
+      let bestIdx = 0;
+      let bestScore = -1;
+      replies.forEach((r, i) => {
+        const sc = pronunciationScore(r.en, text);
+        if (sc > bestScore) {
+          bestScore = sc;
+          bestIdx = i;
+        }
+      });
+      setHeard({ text, matchedIdx: bestIdx, score: bestScore });
+      setChoices((c) => ({ ...c, [stepIdx]: bestIdx }));
+      stopListening();
+      // kısa bir geri bildirimden sonra ilerle
+      window.setTimeout(() => {
+        setStepIdx((s) => {
+          if (s >= scenario!.steps.length - 1) {
+            setFinished(true);
+            completeScenario(scenario!.slug);
+            return s;
+          }
+          return s + 1;
+        });
+      }, 1600);
+    };
+    rec.onerror = () => stopListening();
+    rec.onend = () => setListening(false);
+    try {
+      rec.start();
+    } catch {
+      setListening(false);
+    }
+  }
+
+  function toggleVoiceMode() {
+    const next = !voiceMode;
+    if (!next) {
+      stopListening();
+      cancelSpeech();
+    }
+    // Açıldığında: stepIdx/voiceMode bağımlı effect mevcut adımı seslendirip dinletecek.
+    setVoiceMode(next);
+  }
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [stepIdx, choices, finished]);
+  }, [stepIdx, choices, finished, heard]);
 
   if (!scenario) {
     return (
@@ -73,6 +168,26 @@ export function SimulatorPlay() {
           {scenario.emoji} {scenario.titleTr}
         </h1>
         <p className="text-sm text-muted">{scenario.descriptionTr}</p>
+
+        {recSupported ? (
+          <button
+            onClick={toggleVoiceMode}
+            className={cn(
+              "mt-3 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition",
+              voiceMode ? "bg-cognac text-white shadow-soft" : "border border-cognac text-cognac hover:bg-cognac/10",
+            )}
+          >
+            <Mic size={16} />
+            {voiceMode ? "Sesli sohbet: Açık" : "Sesli sohbet modu"}
+          </button>
+        ) : (
+          <p className="mt-2 text-xs text-muted">Sesli sohbet için Chrome/Edge kullan.</p>
+        )}
+        {voiceMode && (
+          <p className="mt-1 text-xs text-muted">
+            Karşı taraf konuşunca mikrofon otomatik açılır; sen cevabını söyle, uygulama en uygun yanıtı seçer.
+          </p>
+        )}
       </header>
 
       <div className="flex flex-col gap-4">
@@ -95,12 +210,29 @@ export function SimulatorPlay() {
         <div ref={bottomRef} />
       </div>
 
+      {/* Sesli mod durum çubuğu */}
+      {voiceMode && !finished && (listening || heard) && (
+        <div className={cn("rounded-2xl px-4 py-3 text-sm", listening ? "bg-plum/10 text-plum" : "bg-cream text-ink")}>
+          {listening ? (
+            <span className="inline-flex items-center gap-2">
+              <Mic size={15} className="animate-pulse" /> Dinliyorum… cevabını İngilizce söyle.
+            </span>
+          ) : heard ? (
+            <span>
+              Duydum: "<span className="italic">{heard.text}</span>" · eşleşme %{heard.score}
+            </span>
+          ) : null}
+        </div>
+      )}
+
       {/* Etkileşim alanı */}
       {!finished && (
         <div className="card-luxe p-5">
           {current?.replies?.length && choices[stepIdx] === undefined ? (
             <>
-              <p className="mb-3 text-sm font-medium text-cognac">Sen ne dersin? (en uygun cevabı seç)</p>
+              <p className="mb-3 text-sm font-medium text-cognac">
+                {voiceMode ? "Cevabını söyle (ya da dokunarak seç)" : "Sen ne dersin? (en uygun cevabı seç)"}
+              </p>
               <div className="flex flex-col gap-2">
                 {current.replies.map((r, idx) => (
                   <button

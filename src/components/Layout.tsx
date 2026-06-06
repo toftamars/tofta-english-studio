@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { BookOpen, LayoutDashboard, LogOut, Radar, ShoppingBag, Sparkles, Theater, TrendingUp } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogOut, Radar, Settings, ShoppingBag, Sparkles, Theater, TrendingUp } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useProgress } from "../context/ProgressContext";
 import { PROFILES } from "../data";
 import { ProgressRing } from "./ui/ProgressRing";
+import { VoiceSettings } from "../features/settings/VoiceSettings";
 import { cn } from "../lib/cn";
 
 const NAV = [
@@ -19,6 +21,7 @@ export function Layout() {
   const { user, signOut } = useAuth();
   const { level, completedUnits, totalUnits, progress } = useProgress();
   const navigate = useNavigate();
+  const [settingsOpen, setSettingsOpen] = useState(false);
   if (!user) return null;
   const profile = PROFILES[user.profileId];
 
@@ -79,12 +82,20 @@ export function Layout() {
           ))}
         </nav>
 
-        <button
-          onClick={handleSignOut}
-          className="mt-auto flex items-center gap-2 rounded-2xl px-4 py-3 text-sm text-muted transition hover:bg-cream hover:text-ink"
-        >
-          <LogOut size={18} /> Çıkış
-        </button>
+        <div className="mt-auto flex flex-col gap-1">
+          <button
+            onClick={() => setSettingsOpen(true)}
+            className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm text-muted transition hover:bg-cream hover:text-ink"
+          >
+            <Settings size={18} /> Ses Ayarları
+          </button>
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm text-muted transition hover:bg-cream hover:text-ink"
+          >
+            <LogOut size={18} /> Çıkış
+          </button>
+        </div>
       </aside>
 
       {/* Mobil üst başlık (ince) */}
@@ -98,7 +109,9 @@ export function Layout() {
         </div>
         <div className="flex items-center gap-2">
           <span className="chip text-xs">🔥 {progress?.streak ?? 0}</span>
-          <span className="chip text-xs">Lv {level.level}</span>
+          <button onClick={() => setSettingsOpen(true)} className="text-muted transition hover:text-cognac" aria-label="Ses Ayarları">
+            <Settings size={18} />
+          </button>
           <button onClick={handleSignOut} className="text-muted transition hover:text-cognac" aria-label="Çıkış">
             <LogOut size={18} />
           </button>
@@ -131,6 +144,8 @@ export function Layout() {
           </NavLink>
         ))}
       </nav>
+
+      <VoiceSettings open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   );
 }

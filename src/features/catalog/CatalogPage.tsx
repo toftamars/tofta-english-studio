@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ExternalLink, Plus, ShoppingBag, Sparkles, Trash2 } from "lucide-react";
-import type { Product, ProductCategory } from "../../types";
+import { Camera, ExternalLink, Plus, ShoppingBag, Sparkles, Trash2 } from "lucide-react";
+import type { ParsedProduct, Product, ProductCategory } from "../../types";
 import {
   addProduct,
   deleteProduct,
   listProducts,
   parseAllProducts,
   parseProductPaste,
+  uploadProductPhoto,
   type NewProductInput,
 } from "../../lib/products";
-import type { ParsedProduct } from "../../types";
+import { ocrImage } from "../../lib/ocr";
 import { useAuth } from "../../context/AuthContext";
 import { SpeakButton } from "../../components/ui/SpeakButton";
 import { cn } from "../../lib/cn";
@@ -89,7 +90,7 @@ export function CatalogPage() {
         </div>
       </div>
 
-      {showForm && <ProductForm onSubmit={handleAdd} onCancel={() => setShowForm(false)} />}
+      {showForm && <ProductForm userId={user?.id} onSubmit={handleAdd} onCancel={() => setShowForm(false)} />}
       {showBulk && <BulkForm onSubmit={handleBulkAdd} onCancel={() => setShowBulk(false)} />}
 
       {loading ? (
@@ -235,9 +236,11 @@ function BulkForm({
 }
 
 function ProductForm({
+  userId,
   onSubmit,
   onCancel,
 }: {
+  userId?: string;
   onSubmit: (input: NewProductInput) => void;
   onCancel: () => void;
 }) {
@@ -253,43 +256,78 @@ function ProductForm({
   const [imageUrl, setImageUrl] = useState("");
   const [url, setUrl] = useState("");
   const [parsedMsg, setParsedMsg] = useState("");
+  const [photoBusy, setPhotoBusy] = useState<"idle" | "upload" | "ocr">("idle");
+  const [ocrPct, setOcrPct] = useState(0);
+  const [photoMsg, setPhotoMsg] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const valid = name.trim().length > 1;
 
-  function handleParse() {
-    const r = parseProductPaste(paste);
+  function fill(r: ParsedProduct, onlyEmpty = false): string[] {
     const filled: string[] = [];
-    if (r.name) {
+    if (r.name && (!onlyEmpty || !name)) {
       setName(r.name);
       filled.push("isim");
     }
-    if (r.material) {
+    if (r.material && (!onlyEmpty || !material)) {
       setMaterial(r.material);
       filled.push("malzeme");
     }
-    if (r.priceText) {
+    if (r.priceText && (!onlyEmpty || !priceText)) {
       setPriceText(r.priceText);
       filled.push("fiyat");
     }
-    if (r.reference) {
+    if (r.reference && (!onlyEmpty || !reference)) {
       setReference(r.reference);
       filled.push("ref");
     }
-    if (r.summary) {
+    if (r.summary && (!onlyEmpty || !summary)) {
       setSummary(r.summary);
       filled.push("özet");
     }
-    if (r.imageUrl) {
+    if (r.imageUrl && (!onlyEmpty || !imageUrl)) {
       setImageUrl(r.imageUrl);
       filled.push("görsel");
     }
-    if (r.url) {
+    if (r.url && (!onlyEmpty || !url)) {
       setUrl(r.url);
       filled.push("link");
     }
+    return filled;
+  }
+
+  function handleParse() {
+    const filled = fill(parseProductPaste(paste));
     setParsedMsg(
       filled.length ? `Ayrıştırıldı: ${filled.join(", ")}. Kontrol edip kaydet.` : "Otomatik alan bulunamadı; elle doldurabilirsin.",
     );
+  }
+
+  async function handlePhoto(file: File) {
+    setPhotoMsg("");
+    setOcrPct(0);
+    try {
+      setPhotoBusy("upload");
+      const photoUrl = await uploadProductPhoto(file, userId);
+      setImageUrl(photoUrl);
+
+      setPhotoBusy("ocr");
+      const text = await ocrImage(file, setOcrPct);
+      if (text) {
+        const filled = fill(parseProductPaste(text), true);
+        setPhotoMsg(
+          filled.length
+            ? `Fotoğraf eklendi. Okunan: ${filled.join(", ")}. Kontrol et.`
+            : "Fotoğraf eklendi. Üründe okunabilir yazı/kod bulunamadı — alanları elle doldur.",
+        );
+      } else {
+        setPhotoMsg("Fotoğraf eklendi. Yazı okunamadı — alanları elle doldur.");
+      }
+    } catch {
+      setPhotoMsg("Fotoğraf işlenemedi, tekrar dene.");
+    } finally {
+      setPhotoBusy("idle");
+    }
   }
 
   const inputCls = "w-full rounded-2xl border border-line bg-paper px-4 py-3 text-sm outline-none focus:border-cognac";
@@ -305,6 +343,40 @@ function ProductForm({
       }}
       className="card-luxe flex flex-col gap-3 p-4"
     >
+      {/* Fotoğraf çek / yükle (+ OCR) */}
+      <div className="rounded-2xl bg-cream/60 p-3">
+        <p className="mb-2 flex items-center gap-2 text-xs font-semibold text-cognac">
+          <Camera size={14} /> Fotoğraf çek / yükle — etiketteki yazı ve kod otomatik okunur
+        </p>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) handlePhoto(f);
+            e.target.value = "";
+          }}
+        />
+        <div className="flex items-center gap-3">
+          {imageUrl && (
+            <img src={imageUrl} alt="önizleme" className="h-16 w-16 rounded-xl object-cover" />
+          )}
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={photoBusy !== "idle"}
+            className="btn-ghost !px-4 !py-2 text-sm disabled:opacity-50"
+          >
+            <Camera size={15} />
+            {photoBusy === "upload" ? "Yükleniyor…" : photoBusy === "ocr" ? `Okunuyor… %${ocrPct}` : imageUrl ? "Değiştir" : "Fotoğraf"}
+          </button>
+          {photoMsg && <span className="text-xs text-muted">{photoMsg}</span>}
+        </div>
+      </div>
+
       {/* Yapıştır-ayrıştır */}
       <div className="rounded-2xl bg-cream/60 p-3">
         <p className="mb-2 flex items-center gap-2 text-xs font-semibold text-cognac">

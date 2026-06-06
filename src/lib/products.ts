@@ -113,6 +113,31 @@ export async function addProduct(
   return product;
 }
 
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/** Ürün fotoğrafını Supabase Storage'a yükler (yoksa yerel data URL'e düşer). */
+export async function uploadProductPhoto(file: File, userId?: string): Promise<string> {
+  if (supabase && userId) {
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+    const path = `${userId}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage
+      .from("product-photos")
+      .upload(path, file, { upsert: false, contentType: file.type || "image/jpeg" });
+    if (!error) {
+      const { data } = supabase.storage.from("product-photos").getPublicUrl(path);
+      return data.publicUrl;
+    }
+  }
+  return fileToDataUrl(file);
+}
+
 export async function deleteProduct(id: string): Promise<void> {
   if (supabase) {
     const { error } = await supabase.from("products").delete().eq("id", id);
