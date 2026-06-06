@@ -25,7 +25,9 @@ jobs:
           node-version: 20
           cache: npm
 
-      - run: npm ci
+      # npm install (npm ci yerine): platforma özgü opsiyonel bağımlılıkların
+      # (ör. @emnapi/*) Linux runner'da sorunsuz çözülmesi için.
+      - run: npm install --no-audit --no-fund
 
       - name: Build
         run: npm run build
