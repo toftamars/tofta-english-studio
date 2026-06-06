@@ -17,7 +17,7 @@ export const PROFILES: Record<ProfileId, Profile> = {
     role: "Mağaza Müdürü · Zuhal Müzik, Akasya AVM",
     context: "Müzik & perakende yöneticiliği",
     accent: "#7a6a48",
-    available: false, // 2. fazda açılacak
+    available: true,
   },
 };
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { BookOpen, LayoutDashboard, LogOut, Radar, RefreshCw, Settings, ShoppingBag, Sparkles, Theater, TrendingUp, Layers, Zap } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogOut, MoreHorizontal, Radar, RefreshCw, Settings, ShoppingBag, Sparkles, Theater, TrendingUp, Layers, Zap } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useProgress } from "../context/ProgressContext";
 import { useMode } from "../context/ModeContext";
@@ -18,7 +18,11 @@ const NAV = [
   { to: "/app/radar", label: "Radar", icon: Radar },
   { to: "/app/catalog", label: "Katalog", icon: ShoppingBag },
   { to: "/app/progress", label: "Gelişim", icon: TrendingUp },
+  { to: "/app/stack", label: "Stack", icon: Sparkles },
 ];
+
+const MOBILE_PRIMARY = NAV.slice(0, 5);
+const MOBILE_MORE = NAV.slice(5);
 
 export function Layout() {
   const { user, signOut } = useAuth();
@@ -26,6 +30,7 @@ export function Layout() {
   const { modeMeta, modeSelected } = useMode();
   const navigate = useNavigate();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   if (!user) return null;
   const profile = PROFILES[user.profileId];
 
@@ -163,19 +168,19 @@ export function Layout() {
         <Outlet />
       </main>
 
-      {/* Mobil alt navigasyon barı (safe-area) */}
+      {/* Mobil alt navigasyon — 5 ana + Daha fazla */}
       <nav
         className="fixed inset-x-0 bottom-0 z-30 flex items-stretch border-t border-line bg-paper/95 backdrop-blur md:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        {NAV.map(({ to, label, icon: Icon, end }) => (
+        {MOBILE_PRIMARY.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
             end={end}
             className={({ isActive }) =>
               cn(
-                "flex min-h-[56px] flex-1 flex-col items-center justify-center gap-1 py-2 text-[11px] font-medium transition",
+                "flex min-h-[56px] flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium transition",
                 isActive ? "text-cognac" : "text-muted hover:text-ink",
               )
             }
@@ -184,7 +189,55 @@ export function Layout() {
             <span className="leading-none">{label}</span>
           </NavLink>
         ))}
+        <button
+          type="button"
+          onClick={() => setMoreOpen(true)}
+          className={cn(
+            "flex min-h-[56px] flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium text-muted",
+            moreOpen && "text-cognac",
+          )}
+          aria-label="Daha fazla menü"
+        >
+          <MoreHorizontal size={21} />
+          <span className="leading-none">Daha fazla</span>
+        </button>
       </nav>
+
+      {moreOpen && (
+        <div
+          className="fixed inset-0 z-40 flex items-end bg-espresso/40 backdrop-blur-sm md:hidden"
+          onClick={() => setMoreOpen(false)}
+          role="presentation"
+        >
+          <div
+            className="w-full rounded-t-3xl bg-paper p-4"
+            style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-label="Ek menü"
+          >
+            <p className="mb-3 font-serif text-lg text-espresso">Daha fazla</p>
+            <div className="flex flex-col gap-1">
+              {MOBILE_MORE.map(({ to, label, icon: Icon, end }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  end={end}
+                  onClick={() => setMoreOpen(false)}
+                  className={({ isActive }) =>
+                    cn(
+                      "flex min-h-[48px] items-center gap-3 rounded-2xl px-4 text-sm font-medium",
+                      isActive ? "bg-cognac/15 text-cognac" : "text-ink hover:bg-cream",
+                    )
+                  }
+                >
+                  <Icon size={20} /> {label}
+                </NavLink>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <VoiceSettings open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>

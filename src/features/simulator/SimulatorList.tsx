@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Bot } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useProgress } from "../../context/ProgressContext";
 import { useMode } from "../../context/ModeContext";
 import { getScenarios } from "../../data";
+import { isAiDialogAvailable } from "../../lib/aiDialog";
 import { cn } from "../../lib/cn";
 
 export function SimulatorList() {
@@ -23,6 +25,16 @@ export function SimulatorList() {
           {scenarios.length} senaryo · sesli sohbet modu ile karşılıklı pratik.
         </p>
       </header>
+
+      {mode === "work" && isAiDialogAvailable() && (
+        <Link to="/app/simulator/ai-bonus" className="card-luxe flex items-center gap-4 bg-gradient-to-r from-espresso to-mocha p-5 text-ivory transition hover:-translate-y-0.5">
+          <Bot size={28} className="text-gold" />
+          <div>
+            <p className="font-serif text-xl">AI Bonus Diyalog</p>
+            <p className="text-sm text-ivory/75">Serbest LV müşteri sohbeti — günde 20 mesaj</p>
+          </div>
+        </Link>
+      )}
 
       <div className="grid gap-3 sm:grid-cols-2">
         {scenarios.map((s, i) => {

@@ -76,7 +76,10 @@ export function recordQuizAdaptive(
 
   let reviews = [...adaptive.reviews];
   for (const q of wrongQuestions) {
-    reviews.push(makeReviewItem(mode, "quiz", q.q, q.options[q.answer], q.q));
+    const item = makeReviewItem(mode, "quiz", q.q, q.options[q.answer], q.q, reviews);
+    const idx = reviews.findIndex((r) => r.id === item.id);
+    if (idx >= 0) reviews[idx] = item;
+    else reviews.push(item);
   }
 
   const cefrBand = cefrFromSkills(skills);
@@ -101,7 +104,10 @@ export function recordVocabMiss(
 ): AdaptiveState {
   let reviews = [...adaptive.reviews];
   for (const v of items) {
-    reviews.push(makeReviewItem(mode, "vocab", v.en, v.tr, v.en));
+    const item = makeReviewItem(mode, "vocab", v.en, v.tr, v.en, reviews);
+    const idx = reviews.findIndex((r) => r.id === item.id);
+    if (idx >= 0) reviews[idx] = item;
+    else reviews.push(item);
   }
   const skills = bumpSkill(adaptive.skills, "vocab", items.length ? -1 : 1);
   return {
@@ -168,7 +174,10 @@ export function recordDrillAdaptive(
 
   let reviews = [...adaptive.reviews];
   if (!correct && back) {
-    reviews.push(makeReviewItem(mode, "vocab", front, back, front));
+    const item = makeReviewItem(mode, "vocab", front, back, front, reviews);
+    const idx = reviews.findIndex((r) => r.id === item.id);
+    if (idx >= 0) reviews[idx] = item;
+    else reviews.push(item);
   }
 
   return {
@@ -205,7 +214,17 @@ function makeReviewItem(
   front: string,
   back: string,
   speak?: string,
+  existing: ReviewItem[] = [],
 ): ReviewItem {
+  const norm = front.toLowerCase().trim();
+  const dup = existing.find((r) => r.mode === mode && r.kind === kind && r.front.toLowerCase().trim() === norm);
+  if (dup) {
+    return {
+      ...dup,
+      dueAt: new Date(Date.now() + DAY_MS).toISOString(),
+      intervalDays: 1,
+    };
+  }
   const due = new Date(Date.now() + DAY_MS).toISOString();
   return {
     id: `${mode}-${kind}-${front.slice(0, 24)}-${Date.now()}`,

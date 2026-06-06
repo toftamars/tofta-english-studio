@@ -5,9 +5,13 @@ import { WORD_BANK, SENTENCE_TEMPLATES } from "../data/word-bank";
 
 let cachedPool: PoolEntry[] | null = null;
 
+export function clearExercisePoolCache() {
+  cachedPool = null;
+}
+
 /** Tüm kaynaklardan birleşik kelime/cümle havuzu */
-export function buildExercisePool(profileId: ProfileId = "hulya"): PoolEntry[] {
-  if (cachedPool) return cachedPool;
+export function buildExercisePool(profileId: ProfileId = "hulya", extra: PoolEntry[] = []): PoolEntry[] {
+  if (cachedPool && extra.length === 0) return [...cachedPool, ...extra];
 
   const entries: PoolEntry[] = [];
   const seen = new Set<string>();
@@ -68,8 +72,21 @@ export function buildExercisePool(profileId: ProfileId = "hulya"): PoolEntry[] {
     });
   }
 
-  cachedPool = entries;
+  for (const e of extra) add(e);
+
+  if (extra.length === 0) cachedPool = entries;
   return entries;
+}
+
+/** Katalog ürünlerinden drill girdileri */
+export function poolEntriesFromProducts(products: { name: string; material?: string; line?: string; summary?: string }[]): PoolEntry[] {
+  return products.flatMap((p) => {
+    const entries: PoolEntry[] = [
+      { en: p.name, tr: p.line || p.name, def: p.summary, tags: ["catalog", "work"] },
+    ];
+    if (p.material) entries.push({ en: p.material, tr: "malzeme", example: `This ${p.name} is made of ${p.material}.`, tags: ["catalog"] });
+    return entries;
+  });
 }
 
 export function poolForMode(profileId: ProfileId, mode: LearningMode): PoolEntry[] {

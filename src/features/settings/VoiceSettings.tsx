@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Volume2, X } from "lucide-react";
 import {
+  getElevenLabsQuota,
   getPreferredVoiceName,
   getSpeechRate,
+  getVoiceEngine,
+  isElevenLabsAvailable,
   listEnglishVoices,
   setPreferredVoiceName,
   setSpeechRate,
+  setVoiceEngine,
   speak,
+  type VoiceEngine,
 } from "../../lib/speech";
 
 const SAMPLE = "Welcome to Louis Vuitton. How may I help you today?";
@@ -16,12 +21,15 @@ export function VoiceSettings({ open, onClose }: { open: boolean; onClose: () =>
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [rate, setRate] = useState(0.95);
+  const [engine, setEngine] = useState<VoiceEngine>("browser");
+  const [quota, setQuota] = useState(getElevenLabsQuota());
 
   useEffect(() => {
     if (!open) return;
     setRate(getSpeechRate());
     setSelected(getPreferredVoiceName());
-    // Sesler bazen geç yüklenir; birkaç kez dene
+    setEngine(getVoiceEngine());
+    setQuota(getElevenLabsQuota());
     let tries = 0;
     const tick = () => {
       const list = listEnglishVoices();
@@ -46,6 +54,11 @@ export function VoiceSettings({ open, onClose }: { open: boolean; onClose: () =>
     setRate(r);
     setSpeechRate(r);
   }
+  function changeEngine(e: VoiceEngine) {
+    setEngine(e);
+    setVoiceEngine(e);
+    setQuota(getElevenLabsQuota());
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-espresso/40 backdrop-blur-sm md:items-center" onClick={onClose}>
@@ -55,6 +68,8 @@ export function VoiceSettings({ open, onClose }: { open: boolean; onClose: () =>
         onClick={(e) => e.stopPropagation()}
         className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-paper p-6 md:rounded-3xl"
         style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
+        role="dialog"
+        aria-label="Ses ayarları"
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="flex items-center gap-2 font-serif text-2xl text-espresso">
@@ -64,6 +79,33 @@ export function VoiceSettings({ open, onClose }: { open: boolean; onClose: () =>
             <X size={20} />
           </button>
         </div>
+
+        {isElevenLabsAvailable() && (
+          <div className="mb-4">
+            <p className="mb-2 text-sm font-medium text-espresso">Ses motoru</p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => changeEngine("browser")}
+                className={`flex-1 rounded-2xl border px-3 py-2 text-sm ${engine === "browser" ? "border-cognac bg-cognac/10" : "border-line"}`}
+              >
+                Tarayıcı (ücretsiz)
+              </button>
+              <button
+                type="button"
+                onClick={() => changeEngine("elevenlabs")}
+                className={`flex-1 rounded-2xl border px-3 py-2 text-sm ${engine === "elevenlabs" ? "border-cognac bg-cognac/10" : "border-line"}`}
+              >
+                Premium (ElevenLabs)
+              </button>
+            </div>
+            {engine === "elevenlabs" && (
+              <p className="mt-2 text-xs text-muted">
+                Günlük kota: {quota.used}/{quota.limit} karakter kaldı: {quota.remaining}
+              </p>
+            )}
+          </div>
+        )}
 
         <p className="mb-3 text-sm text-muted">
           Cihazındaki en doğal sesi seç. Listenin başındakiler genelde en kaliteli (Natural / Google / Premium).
@@ -75,7 +117,7 @@ export function VoiceSettings({ open, onClose }: { open: boolean; onClose: () =>
           </p>
         ) : (
           <div className="flex flex-col gap-2">
-            {voices.map((v) => (
+            {voices.slice(0, 12).map((v) => (
               <button
                 key={v.name}
                 onClick={() => choose(v.name)}

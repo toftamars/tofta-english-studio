@@ -46,6 +46,19 @@ export function ModePickerPage() {
           <p className="mt-2 text-sm text-muted">
             Gerçek seviyen: <b className="text-cognac">{cefrLabel(cefr)}</b> — sistem sen yükseldikçe içeriği açar.
           </p>
+          <p className="mt-1 text-xs text-muted">
+            Tofta LV pratik antrenörüdür; genel grammar için Duolingo, telaffuz için ELSA önerilir.{" "}
+            <button
+              type="button"
+              onClick={() => {
+                if (!modeSelected) setMode("work");
+                navigate("/app/stack");
+              }}
+              className="font-semibold text-cognac underline"
+            >
+              Öğrenme stack&apos;in →
+            </button>
+          </p>
         </header>
 
         <div className="flex flex-col gap-4">

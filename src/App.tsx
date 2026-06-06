@@ -16,6 +16,8 @@ const RadarPage = lazy(() => import("./features/radar/RadarPage").then((m) => ({
 const CatalogPage = lazy(() => import("./features/catalog/CatalogPage").then((m) => ({ default: m.CatalogPage })));
 const ReviewPage = lazy(() => import("./features/review/ReviewDeck").then((m) => ({ default: m.ReviewPage })));
 const DrillPage = lazy(() => import("./features/drill/DrillPage").then((m) => ({ default: m.DrillPage })));
+const LearningStackPage = lazy(() => import("./features/guide/LearningStackPage").then((m) => ({ default: m.LearningStackPage })));
+const AiBonusChat = lazy(() => import("./features/simulator/AiBonusChat").then((m) => ({ default: m.AiBonusChat })));
 
 function PageLoader() {
   return (
@@ -75,7 +77,9 @@ export default function App() {
           <Route path="lessons" element={<LessonsList />} />
           <Route path="lessons/:slug" element={<LessonView />} />
           <Route path="drill" element={<DrillPage />} />
+          <Route path="stack" element={<LearningStackPage />} />
           <Route path="simulator" element={<SimulatorList />} />
+          <Route path="simulator/ai-bonus" element={<AiBonusChat />} />
           <Route path="simulator/:slug" element={<SimulatorPlay />} />
           <Route path="radar" element={<RadarPage />} />
           <Route path="catalog" element={<CatalogPage />} />

@@ -2,7 +2,11 @@
 
 Louis Vuitton'a özel, **neşeli ve etkili** bir İngilizce öğrenme platformu.
 Hülya'nın hem **müşterilerle** hem **yöneticilerle** her an İngilizce konuşmaya hazır
-olması için tasarlandı. (Alper'in programı **2. fazda** eklenecek.)
+olması için tasarlandı. Alper'in müzik & perakende programı **2. fazda** aktif.
+
+> **Konumlandırma:** Tofta genel dil uygulaması değil — **Louis Vuitton Client Advisor antrenörü**.
+> Genel grammar için Duolingo, telaffuz için ELSA ile birlikte kullanılmak üzere tasarlandı
+> (uygulama içi **Öğrenme stack** rehberi).
 
 > Klasik sıkıcı İngilizce kurslarından farklı: gerçek mağaza senaryoları,
 > rol-yapma simülatörü, sesli çalışma, oyunlaştırma (XP, seri, rozetler) ve
@@ -12,12 +16,12 @@ olması için tasarlandı. (Alper'in programı **2. fazda** eklenecek.)
 
 ## ✨ Özellikler
 
-- **10 üniteli müfredat (A2):** Karşılamadan satışı kapatmaya, ürün bilgisinden
-  marka tarihçesine kadar Louis Vuitton satış seremonisinin her adımı.
-- **Rol-Yapma Simülatörü:** Gerçek müşteri ve yönetici diyalogları. En uygun
-  cevabı seç, anında geri bildirim al, mikrofonla sesli söyle.
-- **Sesli çalışma:** Her cümleyi dinle (🔊) ve mikrofonla telaffuzunu test et (🎤).
-  *(Sağlayıcı modüler — ileride premium gerçekçi ses takılabilir.)*
+- **31 ünite müfredat (A2–B1):** Work (18), Daily (6), Social (6) — LV satış seremonisinden günlük hayata.
+- **Alıştırma merkezi:** 400+ kelime/cümle havuzu, 6 egzersiz türü, katalog ürünlerinden dinamik kartlar.
+- **Rol-Yapma Simülatörü:** 70+ senaryo + opsiyonel AI bonus diyalog (gpt-4o-mini, günlük limit).
+- **Sesli çalışma:** Tarayıcı TTS + opsiyonel ElevenLabs premium ses; kelime bazlı telaffuz skoru.
+- **PWA:** Ana ekrana ekle, offline drill/ders cache.
+- **Test & CI:** 30+ Vitest, Playwright E2E (login, drill, simülatör).
 - **Her beceri:** İfadeler · Kelime kartları · Dilbilgisi · Dinleme · Konuşma ·
   Yazma · Quiz.
 - **Oyunlaştırma:** XP, seviye, günlük seri ve rozetlerle motivasyon.
@@ -120,6 +124,11 @@ Canlı adres: `https://toftamars.github.io/tofta-english-studio/`
 ## 🗺️ Yol haritası
 
 - [x] 1. Faz — Hülya: LV müfredatı, simülatör, sesli çalışma, oyunlaştırma
-- [ ] Supabase bulut girişi + cihazlar arası senkron
-- [ ] Premium gerçekçi ses (ElevenLabs vb.)
-- [ ] 2. Faz — Alper: müzik & perakende yöneticiliği müfredatı
+- [x] Alıştırma merkezi (drill) + 400+ havuz
+- [x] PWA (offline cache, A2HS) + mobil nav
+- [x] CI + Vitest 30+ + Playwright E2E
+- [x] ElevenLabs TTS + telaffuz kelime skoru
+- [x] Adaptif zayıf beceri yönlendirme + öğrenme stack UI
+- [x] 31 ünite hedefi + AI bonus diyalog
+- [x] 2. Faz — Alper: müzik & perakende müfredatı (temel)
+- [ ] Supabase bulut girişi + cihazlar arası senkron (kurulum rehberi hazır)

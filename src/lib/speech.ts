@@ -1,9 +1,5 @@
 // ============================================================
-// Ses Motoru — Modüler tasarım
-//  - Şimdi: tarayıcının yerleşik Web Speech API'si (ücretsiz)
-//  - İleride: premium sağlayıcı (ör. ElevenLabs) buraya takılabilir.
-//    VoiceProvider arayüzünü uygulayan yeni bir sınıf yazıp
-//    `activeProvider` değişkenini değiştirmek yeterli olacak.
+// Ses Motoru — Modüler: Browser TTS + ElevenLabs (opsiyonel)
 // ============================================================
 
 export interface SpeakOptions {
@@ -12,10 +8,18 @@ export interface SpeakOptions {
   onEnd?: () => void;
 }
 
+export type VoiceEngine = "browser" | "elevenlabs";
+
 const VOICE_KEY = "tofta-voice-name";
 const RATE_KEY = "tofta-voice-rate";
+const ENGINE_KEY = "tofta-voice-engine";
+const QUOTA_KEY = "tofta-elevenlabs-chars";
+const QUOTA_DAY_KEY = "tofta-elevenlabs-day";
+const DAILY_CHAR_LIMIT = 8000;
 
-/** İngilizce sesleri kaliteye göre puanlar (yüksek = daha doğal). */
+const ELEVENLABS_KEY = import.meta.env.VITE_ELEVENLABS_API_KEY as string | undefined;
+const ELEVENLABS_VOICE = (import.meta.env.VITE_ELEVENLABS_VOICE_ID as string) || "21m00Tcm4TlvDq8ikWAM";
+
 function scoreVoice(v: SpeechSynthesisVoice): number {
   const lang = v.lang || "";
   if (!/^en/i.test(lang)) return -1;
@@ -24,12 +28,12 @@ function scoreVoice(v: SpeechSynthesisVoice): number {
   if (/en-gb/i.test(lang)) s += 3;
   else if (/en-us|en-au|en-ie/i.test(lang)) s += 2;
   else s += 1;
-  if (/natural|neural/.test(n)) s += 8; // Microsoft/Edge "Natural" sesleri en iyi
-  if (/google/.test(n)) s += 6; // Chrome bulut sesleri
-  if (/premium|enhanced/.test(n)) s += 5; // Apple gelişmiş sesler
+  if (/natural|neural/.test(n)) s += 8;
+  if (/google/.test(n)) s += 6;
+  if (/premium|enhanced/.test(n)) s += 5;
   if (/(samantha|karen|serena|sonia|libby|aria|jenny|ryan|daniel|moira|tessa|ava|zoe|allison|evan|nathan|kate|stephanie)/.test(n))
     s += 3;
-  if (v.localService === false) s += 2; // ağ sesleri genelde daha kaliteli
+  if (v.localService === false) s += 2;
   return s;
 }
 
@@ -50,7 +54,6 @@ class BrowserVoiceProvider {
     return typeof window !== "undefined" && "speechSynthesis" in window;
   }
 
-  /** Kaliteye göre sıralı İngilizce sesler. */
   englishVoices(): SpeechSynthesisVoice[] {
     if (!this.voices.length && this.isSupported()) this.voices = window.speechSynthesis.getVoices();
     return this.voices
@@ -127,9 +130,106 @@ class BrowserVoiceProvider {
   }
 }
 
+function todayKey() {
+  return new Date().toDateString();
+}
+
+export function getElevenLabsQuota(): { used: number; limit: number; remaining: number } {
+  try {
+    const day = localStorage.getItem(QUOTA_DAY_KEY);
+    const used = day === todayKey() ? Number(localStorage.getItem(QUOTA_KEY) || 0) : 0;
+    return { used, limit: DAILY_CHAR_LIMIT, remaining: Math.max(0, DAILY_CHAR_LIMIT - used) };
+  } catch {
+    return { used: 0, limit: DAILY_CHAR_LIMIT, remaining: DAILY_CHAR_LIMIT };
+  }
+}
+
+function trackElevenLabsChars(n: number) {
+  try {
+    const day = todayKey();
+    if (localStorage.getItem(QUOTA_DAY_KEY) !== day) {
+      localStorage.setItem(QUOTA_DAY_KEY, day);
+      localStorage.setItem(QUOTA_KEY, "0");
+    }
+    const used = Number(localStorage.getItem(QUOTA_KEY) || 0) + n;
+    localStorage.setItem(QUOTA_KEY, String(used));
+  } catch {
+    /* yoksay */
+  }
+}
+
+let elevenAudio: HTMLAudioElement | null = null;
+
+async function speakElevenLabs(text: string, opts: SpeakOptions = {}): Promise<boolean> {
+  if (!ELEVENLABS_KEY) return false;
+  const quota = getElevenLabsQuota();
+  if (text.length > quota.remaining) return false;
+
+  try {
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "xi-api-key": ELEVENLABS_KEY,
+      },
+      body: JSON.stringify({
+        text,
+        model_id: "eleven_turbo_v2_5",
+        voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: opts.rate ?? getSpeechRate() },
+      }),
+    });
+    if (!res.ok) return false;
+    const blob = await res.blob();
+    trackElevenLabsChars(text.length);
+    if (elevenAudio) {
+      elevenAudio.pause();
+      elevenAudio = null;
+    }
+    const url = URL.createObjectURL(blob);
+    elevenAudio = new Audio(url);
+    elevenAudio.onended = () => {
+      URL.revokeObjectURL(url);
+      opts.onEnd?.();
+    };
+    await elevenAudio.play();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function isElevenLabsAvailable(): boolean {
+  return Boolean(ELEVENLABS_KEY);
+}
+
+export function getVoiceEngine(): VoiceEngine {
+  if (!isElevenLabsAvailable()) return "browser";
+  try {
+    const v = localStorage.getItem(ENGINE_KEY);
+    if (v === "elevenlabs" || v === "browser") return v;
+  } catch {
+    /* yoksay */
+  }
+  return "browser";
+}
+
+export function setVoiceEngine(engine: VoiceEngine) {
+  try {
+    localStorage.setItem(ENGINE_KEY, engine);
+  } catch {
+    /* yoksay */
+  }
+}
+
 const browserProvider = new BrowserVoiceProvider();
 
 export function speak(text: string, opts?: SpeakOptions) {
+  if (getVoiceEngine() === "elevenlabs") {
+    speakElevenLabs(text, opts).then((ok) => {
+      if (!ok) browserProvider.speak(text, opts);
+    });
+    return;
+  }
   browserProvider.speak(text, opts);
 }
 
@@ -139,13 +239,15 @@ export function speakSequence(lines: string[], opts?: SpeakOptions) {
 
 export function cancelSpeech() {
   browserProvider.cancel();
+  if (elevenAudio) {
+    elevenAudio.pause();
+    elevenAudio = null;
+  }
 }
 
 export function isSpeechSupported() {
   return browserProvider.isSupported();
 }
-
-// ---------------- Ses tercihleri (ayarlar için) ----------------
 
 export function listEnglishVoices(): SpeechSynthesisVoice[] {
   return browserProvider.englishVoices();
@@ -163,7 +265,7 @@ export function setSpeechRate(rate: number) {
   browserProvider.setRate(rate);
 }
 
-// ---------------- Konuşma Tanıma (telaffuz testi) ----------------
+// ---------------- Konuşma Tanıma ----------------
 
 type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
 
@@ -174,7 +276,7 @@ interface SpeechRecognitionLike {
   start(): void;
   stop(): void;
   onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
-  onerror: ((e: unknown) => void) | null;
+  onerror: ((e: { error?: string }) => void) | null;
   onend: (() => void) | null;
 }
 
@@ -184,6 +286,21 @@ export function isRecognitionSupported() {
     (window as unknown as Record<string, unknown>).SpeechRecognition ||
       (window as unknown as Record<string, unknown>).webkitSpeechRecognition,
   );
+}
+
+export function getRecognitionErrorMessage(error?: string): string {
+  switch (error) {
+    case "not-allowed":
+      return "Mikrofon izni reddedildi. Ayarlar → Safari/Chrome → Mikrofon iznini aç.";
+    case "no-speech":
+      return "Ses duyulmadı. Tekrar deneyin ve cihazı ağzınıza yaklaştırın.";
+    case "network":
+      return "Ağ hatası. Chrome/Edge kullanmayı deneyin.";
+    case "aborted":
+      return "Dinleme iptal edildi.";
+    default:
+      return "Mikrofon hatası. Chrome veya Edge ile tekrar deneyin.";
+  }
 }
 
 export function createRecognizer(): SpeechRecognitionLike | null {
@@ -198,19 +315,5 @@ export function createRecognizer(): SpeechRecognitionLike | null {
   return rec;
 }
 
-function normalize(s: string) {
-  return s
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-/** Hedef cümleyle duyulan cümle arasındaki kelime örtüşme yüzdesi (0-100). */
-export function pronunciationScore(target: string, heard: string): number {
-  const wa = normalize(target).split(" ").filter(Boolean);
-  if (!wa.length) return 0;
-  const wb = new Set(normalize(heard).split(" "));
-  const hit = wa.filter((w) => wb.has(w)).length;
-  return Math.round((hit / wa.length) * 100);
-}
+export { pronunciationScore, analyzePronunciation } from "./pronunciation";
+export type { PronunciationAnalysis, WordScore } from "./pronunciation";

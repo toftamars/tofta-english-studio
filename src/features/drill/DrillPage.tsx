@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Brain,
@@ -17,7 +17,8 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import { useProgress } from "../../context/ProgressContext";
 import { useMode } from "../../context/ModeContext";
-import { poolStats } from "../../lib/exercisePool";
+import { poolStats, poolEntriesFromProducts } from "../../lib/exercisePool";
+import { getLocalProductsSync } from "../../lib/products";
 import { generateDrillRound, generateMatchRound, sessionSeed } from "../../lib/exerciseGenerator";
 import type { DrillExercise, DrillKind } from "../../types";
 import { SpeakButton } from "../../components/ui/SpeakButton";
@@ -38,7 +39,9 @@ export function DrillPage() {
   const { user } = useAuth();
   const { recordDrillAnswer, reviewsDue } = useProgress();
   const { mode, modeMeta } = useMode();
+  const [searchParams] = useSearchParams();
   const stats = useMemo(() => poolStats(user?.profileId ?? "hulya"), [user?.profileId]);
+  const catalogExtra = useMemo(() => poolEntriesFromProducts(getLocalProductsSync()), []);
 
   const [activeKind, setActiveKind] = useState<DrillKind | null>(null);
   const [seed, setSeed] = useState(() => sessionSeed());
@@ -69,14 +72,22 @@ export function DrillPage() {
       setRoundDone(false);
 
       if (kind === "match") {
-        const m = generateMatchRound(user!.profileId, mode, newSeed);
+        const m = generateMatchRound(user!.profileId, mode, newSeed, catalogExtra);
         setRound(m ? [m] : []);
       } else {
-        setRound(generateDrillRound(user!.profileId, mode, kind, ROUND_SIZE, newSeed));
+        setRound(generateDrillRound(user!.profileId, mode, kind, ROUND_SIZE, newSeed, catalogExtra));
       }
     },
-    [user, mode],
+    [user, mode, catalogExtra],
   );
+
+  useEffect(() => {
+    const kind = searchParams.get("kind") as DrillKind | null;
+    if (kind && user && MODES.some((m) => m.kind === kind) && !activeKind) {
+      startSession(kind);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, user]);
 
   const nextRound = useCallback(() => {
     const newSeed = sessionSeed(seed);
@@ -90,12 +101,12 @@ export function DrillPage() {
     setMatchPairs({});
     setRoundDone(false);
     if (activeKind === "match") {
-      const m = generateMatchRound(user!.profileId, mode, newSeed);
+      const m = generateMatchRound(user!.profileId, mode, newSeed, catalogExtra);
       setRound(m ? [m] : []);
     } else if (activeKind) {
-      setRound(generateDrillRound(user!.profileId, mode, activeKind, ROUND_SIZE, newSeed));
+      setRound(generateDrillRound(user!.profileId, mode, activeKind, ROUND_SIZE, newSeed, catalogExtra));
     }
-  }, [activeKind, user, mode, seed]);
+  }, [activeKind, user, mode, seed, catalogExtra]);
 
   const ex = round[idx];
 

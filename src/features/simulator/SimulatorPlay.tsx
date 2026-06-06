@@ -9,13 +9,14 @@ import { useMode } from "../../context/ModeContext";
 import type { DialogueStep, ReplyOption } from "../../types";
 import { SpeakButton } from "../../components/ui/SpeakButton";
 import { MicButton } from "../../components/ui/MicButton";
-import { createRecognizer, isRecognitionSupported, pronunciationScore, speak, cancelSpeech } from "../../lib/speech";
+import { analyzePronunciation, createRecognizer, isRecognitionSupported, speak, cancelSpeech } from "../../lib/speech";
 import { cn } from "../../lib/cn";
 
 interface HeardResult {
   text: string;
   matchedIdx: number;
   score: number;
+  weakWords: string[];
 }
 
 export function SimulatorPlay() {
@@ -123,14 +124,16 @@ export function SimulatorPlay() {
       const replies = step.replies ?? [];
       let bestIdx = 0;
       let bestScore = -1;
+      let weakWords: string[] = [];
       replies.forEach((r, i) => {
-        const sc = pronunciationScore(r.en, text);
-        if (sc > bestScore) {
-          bestScore = sc;
+        const analysis = analyzePronunciation(r.en, text);
+        if (analysis.overall > bestScore) {
+          bestScore = analysis.overall;
           bestIdx = i;
+          weakWords = analysis.weakWords;
         }
       });
-      setHeard({ text, matchedIdx: bestIdx, score: bestScore });
+      setHeard({ text, matchedIdx: bestIdx, score: bestScore, weakWords });
       setChoices((c) => ({ ...c, [stepIdx]: bestIdx }));
       stopListening();
       clearAdvanceTimer();
@@ -277,7 +280,12 @@ export function SimulatorPlay() {
             </span>
           ) : heard ? (
             <span>
-              Duydum: "<span className="italic">{heard.text}</span>" · eşleşme %{heard.score}
+              Duydum: "<span className="italic">{heard.text}</span>" · telaffuz %{heard.score}
+              {heard.weakWords.length > 0 && (
+                <span className="mt-1 block text-plum">
+                  Zayıf kelimeler: {heard.weakWords.join(", ")} — ELSA ile ısınmayı dene.
+                </span>
+              )}
             </span>
           ) : null}
         </div>

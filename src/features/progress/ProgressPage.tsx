@@ -39,6 +39,8 @@ export function ProgressPage() {
 
   const cefrPct = skills ? cefrProgress(skills, cefr) : 0;
 
+  const drillHistory = aggregateDrillHistory(progress.adaptive?.history ?? []);
+
   return (
     <div className="flex flex-col gap-6">
       <header>
@@ -58,6 +60,9 @@ export function ProgressPage() {
           </ProgressRing>
           <p className="text-center text-sm text-muted">
             Sonraki seviyeye <b className="text-espresso">%{cefrPct}</b> — quiz, konuşma ve dinleme seni yükseltir.
+          </p>
+          <p className="rounded-xl bg-cream/80 px-3 py-2 text-center text-xs text-muted">
+            Bu <b>tahmini</b> seviyedir (resmi CEFR sınavı değil). Quiz, simülatör, alıştırma ve tekrar kartları becerilerini günceller.
           </p>
           <Link to="/app/modes" className="text-xs font-semibold text-cognac hover:underline">
             Mod değiştir →
@@ -100,6 +105,23 @@ export function ProgressPage() {
         <Stat label="Ünite ({modeMeta.labelTr})" value={`${completedUnits}/${totalUnits}`} />
         <Stat label="Simülasyon" value={`${progress.scenariosDone.length}`} />
       </div>
+
+      {drillHistory.length > 0 && (
+        <div className="card-luxe p-6">
+          <h2 className="mb-4 font-serif text-2xl text-espresso">Haftalık alıştırma</h2>
+          <div className="h-56 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={drillHistory} margin={{ left: -20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2d6c2" />
+                <XAxis dataKey="name" stroke="#8a7868" fontSize={11} />
+                <YAxis stroke="#8a7868" fontSize={12} domain={[0, 100]} />
+                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #e2d6c2", background: "#fbf8f1" }} />
+                <Bar dataKey="Ortalama" fill="#6b4c3b" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
 
       {chartData.length > 0 && (
         <div className="card-luxe p-6">
@@ -151,4 +173,19 @@ function Stat({ label, value }: { label: string; value: string }) {
       <p className="font-display text-3xl text-espresso">{value}</p>
     </div>
   );
+}
+
+function aggregateDrillHistory(history: { date: string; kind: string; score: number }[]) {
+  const byDay = new Map<string, { total: number; count: number }>();
+  for (const h of history.filter((x) => x.kind === "drill")) {
+    const day = h.date.slice(0, 10);
+    const cur = byDay.get(day) ?? { total: 0, count: 0 };
+    byDay.set(day, { total: cur.total + h.score, count: cur.count + 1 });
+  }
+  return Array.from(byDay.entries())
+    .slice(-7)
+    .map(([day, { total, count }]) => ({
+      name: day.slice(5),
+      Ortalama: Math.round(total / count),
+    }));
 }

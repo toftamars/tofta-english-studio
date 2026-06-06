@@ -31,6 +31,12 @@ function loadLocal(): Product[] {
     return [];
   }
 }
+
+/** Drill havuzu için senkron yerel ürün listesi */
+export function getLocalProductsSync(): Product[] {
+  if (typeof localStorage === "undefined") return [];
+  return loadLocal();
+}
 function saveLocal(items: Product[]) {
   localStorage.setItem(LOCAL_KEY, JSON.stringify(items));
 }

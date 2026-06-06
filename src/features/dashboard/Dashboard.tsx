@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Flame, Lightbulb, Sparkles, Theater, Type, X, Zap } from "lucide-react";
+import { ArrowRight, Flame, Lightbulb, Sparkles, Theater, Target, Type, X, Zap } from "lucide-react";
 import { poolStats } from "../../lib/exercisePool";
+import { recommendForSkills } from "../../lib/skillRecommendations";
+import { InstallPrompt } from "../../components/ui/InstallPrompt";
+import { LearningStackCard } from "../guide/LearningStackPage";
 import { useAuth } from "../../context/AuthContext";
 import { useProgress } from "../../context/ProgressContext";
 import { useMode } from "../../context/ModeContext";
@@ -39,6 +42,9 @@ export function Dashboard() {
   const scenarios = getScenarios(user.profileId, mode, cefr);
   const word = getWordOfDay();
   const drillStats = poolStats(user.profileId);
+  const skillRec = progress?.adaptive?.skills
+    ? recommendForSkills(progress.adaptive.skills, mode)
+    : null;
 
   const nextUnit = units.find((u) => !isUnitDone(u.slug)) ?? units[units.length - 1];
   const nextScenario =
@@ -117,6 +123,28 @@ export function Dashboard() {
           </div>
         </div>
       </motion.div>
+
+      <InstallPrompt />
+
+      {skillRec && (
+        <Link
+          to={
+            skillRec.route === "/app/drill"
+              ? `/app/drill?kind=${skillRec.drillKind}`
+              : skillRec.route
+          }
+          className="card-luxe flex items-start gap-3 p-4 transition hover:shadow-soft"
+        >
+          <Target size={20} className="mt-0.5 shrink-0 text-cognac" />
+          <div>
+            <p className="font-semibold text-espresso">Zayıf beceri: {skillRec.labelTr}</p>
+            <p className="text-sm text-muted">{skillRec.reasonTr}</p>
+          </div>
+          <ArrowRight size={18} className="ml-auto shrink-0 text-cognac" />
+        </Link>
+      )}
+
+      <LearningStackCard />
 
       {/* Günün özeti */}
       <div className="grid gap-4 sm:grid-cols-3">

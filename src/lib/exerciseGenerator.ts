@@ -147,8 +147,13 @@ export function generateDrillRound(
   kind: DrillKind,
   count: number,
   seed: number,
+  extra: PoolEntry[] = [],
 ): DrillExercise[] {
-  const pool = poolForMode(profileId, mode);
+  const base = poolForMode(profileId, mode);
+  const pool =
+    extra.length > 0
+      ? [...base, ...extra.filter((e) => !e.mode || e.mode === mode)]
+      : base;
   if (pool.length < 4) return [];
 
   const rand = mulberry32(seed);
@@ -208,8 +213,13 @@ export function generateMatchRound(
   profileId: ProfileId,
   mode: LearningMode,
   seed: number,
+  extra: PoolEntry[] = [],
 ): DrillExercise | null {
-  const pool = poolForMode(profileId, mode).filter((p) => p.tr);
+  const base = poolForMode(profileId, mode).filter((p) => p.tr);
+  const pool =
+    extra.length > 0
+      ? [...base, ...extra.filter((e) => e.tr && (!e.mode || e.mode === mode))]
+      : base;
   if (pool.length < 4) return null;
   const rand = mulberry32(seed);
   const pairs = shuffle(pool, rand).slice(0, 4);

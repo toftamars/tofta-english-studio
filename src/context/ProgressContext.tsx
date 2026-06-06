@@ -337,7 +337,7 @@ function recomputeBadges(p: UserProgress) {
   const completed = allUnits.filter((u) => u.completed).length;
   if (completed >= 1) awardBadge(p, "first-unit");
   if (completed >= 5) awardBadge(p, "halfway");
-  if (completed >= 13) awardBadge(p, "all-units");
+  if (completed >= 18) awardBadge(p, "all-units");
   if ((p.streak || 0) >= 3) awardBadge(p, "streak-3");
   if ((p.streak || 0) >= 7) awardBadge(p, "streak-7");
   if (p.scenariosDone.length >= 5) awardBadge(p, "role-player");
