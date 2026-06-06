@@ -206,6 +206,238 @@ export const HULYA_SCENARIOS: Scenario[] = [
       ] },
     ],
   },
+
+  {
+    slug: "vip-returning",
+    title: "A Returning VIP Client",
+    titleTr: "Geri Dönen VIP Müşteri",
+    emoji: "💎",
+    kind: "client",
+    descriptionTr: "Daha önce alışveriş yapmış değerli bir müşteri tekrar geliyor. Onu tanıdığını hissettir.",
+    difficulty: 2,
+    steps: [
+      { speaker: "narrator", en: "A client you served last month returns to the boutique.", tr: "Geçen ay ilgilendiğin bir müşteri butiğe geri dönüyor." },
+      { speaker: "client", en: "Hello again! Do you remember me?", tr: "Tekrar merhaba! Beni hatırladınız mı?", replies: [
+        { en: "Of course, Mrs. Yılmaz! Welcome back. How is your Capucines bag?", tr: "Tabii ki, Yılmaz Hanım! Tekrar hoş geldiniz. Capucines çantanız nasıl?", best: true, feedbackTr: "İsmi ve önceki alışverişi hatırlamak en güçlü clienteling becerisidir." },
+        { en: "Sorry, I see many people.", tr: "Üzgünüm, çok insan görüyorum.", feedbackTr: "Asla; müşteriyi özel hissettir, soğuk olma." },
+      ] },
+      { speaker: "client", en: "It's perfect! I'm looking for something to match it.", tr: "Mükemmel! Ona uyacak bir şey arıyorum.", replies: [
+        { en: "Wonderful. We just received a matching wallet — may I show you?", tr: "Harika. Tam uyumlu bir cüzdan geldi — göstereyim mi?", best: true, feedbackTr: "İhtiyaca bağlı, kişiselleştirilmiş öneri." },
+        { en: "We don't have anything.", tr: "Hiçbir şeyimiz yok.", feedbackTr: "Önce ürün bilgini kullan, çözüm sun." },
+      ] },
+      { speaker: "client", en: "Yes, please. You always take good care of me.", tr: "Evet, lütfen. Bana hep çok iyi bakıyorsunuz.", replies: [
+        { en: "It's my pleasure. May I take your number to inform you about new arrivals?", tr: "Rica ederim. Yeni gelenlerden haberdar etmek için numaranızı alabilir miyim?", best: true, feedbackTr: "İlişkiyi sürdürmek için iletişim bilgisi iste — clienteling." },
+      ] },
+    ],
+  },
+
+  {
+    slug: "gift-for-him",
+    title: "Buying a Gift for Him",
+    titleTr: "Erkeğe Hediye Almak",
+    emoji: "🎁",
+    kind: "client",
+    descriptionTr: "Bir müşteri eşine doğum günü hediyesi arıyor ama ne alacağını bilmiyor.",
+    difficulty: 2,
+    steps: [
+      { speaker: "client", en: "I need a gift for my husband. It's his birthday.", tr: "Eşime bir hediye lazım. Doğum günü.", replies: [
+        { en: "Happy birthday to him! Does he prefer bags, accessories, or something to wear?", tr: "Doğum günü kutlu olsun! Çanta mı, aksesuar mı, yoksa giyilecek bir şey mi tercih eder?", best: true, feedbackTr: "Sıcak + ihtiyacı daraltan açık uçlu soru." },
+        { en: "Just buy a belt.", tr: "Sadece bir kemer alın.", feedbackTr: "Önce kişiyi tanı, sonra öner." },
+      ] },
+      { speaker: "client", en: "He travels a lot for work.", tr: "İş için çok seyahat ediyor.", replies: [
+        { en: "Then a leather wash bag or a card holder is both useful and elegant.", tr: "O zaman deri bir makyaj/banyo çantası ya da kartlık hem kullanışlı hem şık olur.", best: true, feedbackTr: "Yaşam tarzına uygun, mantıklı öneri." },
+        { en: "Maybe a big suitcase, very expensive.", tr: "Belki çok pahalı büyük bir valiz.", feedbackTr: "Fiyatı öne çıkarma; ihtiyaca odaklan." },
+      ] },
+      { speaker: "client", en: "The card holder is lovely. Can you wrap it?", tr: "Kartlık çok güzel. Paketleyebilir misiniz?", replies: [
+        { en: "Of course. Would you like to add a handwritten birthday note?", tr: "Tabii. El yazısıyla bir doğum günü notu eklemek ister misiniz?", best: true, feedbackTr: "Kişisel dokunuş deneyimi yükseltir." },
+      ] },
+    ],
+  },
+
+  {
+    slug: "waitlist-iconic",
+    title: "The Item Is Out of Stock",
+    titleTr: "Ürün Stokta Yok",
+    emoji: "⏳",
+    kind: "client",
+    descriptionTr: "Müşteri çok istenen bir modeli istiyor ama stokta yok. Onu kaybetme.",
+    difficulty: 3,
+    steps: [
+      { speaker: "client", en: "I really want the black Pochette. Do you have it?", tr: "Siyah Pochette'i gerçekten istiyorum. Var mı?", replies: [
+        { en: "It's a beautiful choice. Let me check our stock for you right now.", tr: "Çok güzel bir seçim. Hemen sizin için stoğumuzu kontrol edeyim.", best: true, feedbackTr: "Önce umut ver, sonra kontrol et." },
+        { en: "No, we never have it.", tr: "Hayır, hiç olmuyor.", feedbackTr: "Olumsuz ve kapatıcı; çözüm sun." },
+      ] },
+      { speaker: "client", en: "Oh no… is it really not available?", tr: "Ah hayır… gerçekten yok mu?", replies: [
+        { en: "Not in store today, but I can add you to the waiting list or find it in another boutique.", tr: "Bugün mağazada yok, ama sizi bekleme listesine ekleyebilir ya da başka bir butikte bulabilirim.", best: true, feedbackTr: "Somut iki çözüm — müşteriyi tutarsın." },
+        { en: "You can try online.", tr: "İnternetten deneyebilirsiniz.", feedbackTr: "Müşteriyi başka yere gönderme; hizmeti sen ver." },
+      ] },
+      { speaker: "client", en: "Please add me to the list. How long will it take?", tr: "Lütfen beni listeye ekleyin. Ne kadar sürer?", replies: [
+        { en: "Usually one to two weeks. I'll call you the moment it arrives.", tr: "Genelde bir-iki hafta. Gelir gelmez sizi arayacağım.", best: true, feedbackTr: "Net beklenti + takip sözü." },
+      ] },
+    ],
+  },
+
+  {
+    slug: "cross-sell-slg",
+    title: "Suggesting a Second Piece",
+    titleTr: "İkinci Bir Parça Önermek",
+    emoji: "✨",
+    kind: "client",
+    descriptionTr: "Müşteri bir çanta aldı. Zarifçe tamamlayıcı bir ürün öner (baskıcı olmadan).",
+    difficulty: 2,
+    steps: [
+      { speaker: "client", en: "I'll take this bag. I'm so happy with it!", tr: "Bu çantayı alıyorum. Çok mutluyum!", replies: [
+        { en: "It suits you beautifully. Many clients pair it with a matching card holder — would you like to see one?", tr: "Size çok yakıştı. Birçok müşteri uyumlu bir kartlıkla tamamlıyor — bakmak ister misiniz?", best: true, feedbackTr: "Yumuşak, doğal çapraz satış." },
+        { en: "Do you also want a wallet, a belt, a scarf, and shoes?", tr: "Cüzdan, kemer, eşarp ve ayakkabı da ister misiniz?", feedbackTr: "Çok fazla; baskıcı hissettirir." },
+      ] },
+      { speaker: "client", en: "Hmm, maybe. But I don't want to spend too much.", tr: "Hmm, belki. Ama çok harcamak istemiyorum.", replies: [
+        { en: "Of course. The card holder is a small piece you'll use every day — but only if you love it.", tr: "Tabii. Kartlık her gün kullanacağınız küçük bir parça — ama yalnızca beğenirseniz.", best: true, feedbackTr: "Değer + baskısız, müşteri merkezli." },
+        { en: "It's cheap, just take it.", tr: "Ucuz, hadi alın.", feedbackTr: "'Ucuz' kelimesi luxury'de kullanılmaz." },
+      ] },
+      { speaker: "client", en: "You're right, I'll take it too.", tr: "Haklısınız, onu da alıyorum.", replies: [
+        { en: "Lovely! I'll prepare both for you and gift-wrap them nicely.", tr: "Harika! İkisini de hazırlayıp güzelce paketleyeyim.", best: true, feedbackTr: "Pozitif kapanış + hizmet." },
+      ] },
+    ],
+  },
+
+  {
+    slug: "tourist-taxfree",
+    title: "A Tourist Asks About Tax-Free",
+    titleTr: "Turist Tax-Free Soruyor",
+    emoji: "🌍",
+    kind: "client",
+    descriptionTr: "Yabancı bir turist vergi iadesi (tax-free) hakkında bilgi istiyor.",
+    difficulty: 2,
+    steps: [
+      { speaker: "client", en: "I'm a tourist. Can I get a tax refund?", tr: "Turistim. Vergi iadesi alabilir miyim?", replies: [
+        { en: "Yes, you can. May I see your passport to prepare the tax-free form?", tr: "Evet, alabilirsiniz. Tax-free formunu hazırlamak için pasaportunuzu görebilir miyim?", best: true, feedbackTr: "Net evet + bir sonraki adım." },
+        { en: "I don't know, ask someone else.", tr: "Bilmiyorum, başkasına sorun.", feedbackTr: "Temel bir prosedürü bilmelisin." },
+      ] },
+      { speaker: "client", en: "Here it is. How do I get the money back?", tr: "Buyurun. Parayı nasıl geri alırım?", replies: [
+        { en: "At the airport, show this form and your purchase before you check in your bags.", tr: "Havalimanında, bagajınızı vermeden önce bu formu ve ürünü gösterin.", best: true, feedbackTr: "Adım adım, anlaşılır bilgi." },
+        { en: "It comes automatically.", tr: "Otomatik gelir.", feedbackTr: "Yanlış bilgi verme; süreci doğru anlat." },
+      ] },
+      { speaker: "client", en: "Thank you, that's very clear.", tr: "Teşekkürler, çok net.", replies: [
+        { en: "You're welcome. Please keep the form safe and enjoy your stay in İstanbul!", tr: "Rica ederim. Formu güvenli tutun ve İstanbul'da keyifli vakit geçirin!", best: true, feedbackTr: "Sıcak, misafirperver kapanış." },
+      ] },
+    ],
+  },
+
+  {
+    slug: "authenticity-care",
+    title: "Authenticity & Care",
+    titleTr: "Orijinallik ve Bakım",
+    emoji: "🧴",
+    kind: "client",
+    descriptionTr: "Müşteri ürünün orijinalliğinden ve nasıl bakım yapacağından emin olmak istiyor.",
+    difficulty: 3,
+    steps: [
+      { speaker: "client", en: "How do I know this is 100% authentic?", tr: "Bunun %100 orijinal olduğunu nasıl bilebilirim?", replies: [
+        { en: "Every piece comes with an invoice and is sold only in our boutiques and official website.", tr: "Her parça faturayla gelir ve yalnızca butiklerimizde ve resmî sitemizde satılır.", best: true, feedbackTr: "Güven veren, doğru bilgi." },
+        { en: "Trust me, it's real.", tr: "Bana güvenin, gerçek.", feedbackTr: "Somut kanıt sun, sadece 'güvenin' deme." },
+      ] },
+      { speaker: "client", en: "Good. And how should I clean the leather?", tr: "Güzel. Peki deriyi nasıl temizlemeliyim?", replies: [
+        { en: "Use a soft, dry cloth. Avoid water and direct sun, and store it in the dust bag.", tr: "Yumuşak, kuru bir bez kullanın. Su ve doğrudan güneşten kaçının, toz torbasında saklayın.", best: true, feedbackTr: "Net ve profesyonel bakım tavsiyesi." },
+        { en: "Just wash it with soap and water.", tr: "Sabun ve suyla yıkayın.", feedbackTr: "Yanlış! Deri suyla yıkanmaz." },
+      ] },
+      { speaker: "client", en: "What if it gets damaged one day?", tr: "Ya bir gün hasar görürse?", replies: [
+        { en: "Bring it to us — we offer a repair service to keep your piece beautiful for years.", tr: "Bize getirin — parçanızı yıllarca güzel tutmak için tamir hizmeti sunuyoruz.", best: true, feedbackTr: "Satış sonrası güven; uzun ömür vurgusu." },
+      ] },
+    ],
+  },
+
+  {
+    slug: "styling-advice",
+    title: "Styling Advice",
+    titleTr: "Kombin Tavsiyesi",
+    emoji: "🧣",
+    kind: "client",
+    descriptionTr: "Müşteri seçtiği parçayı nasıl kombinleyeceğini soruyor. Güvenle tavsiye ver.",
+    difficulty: 2,
+    steps: [
+      { speaker: "client", en: "I love this scarf, but how can I wear it?", tr: "Bu eşarbı çok sevdim ama nasıl takarım?", replies: [
+        { en: "It's very versatile — around the neck, on a bag, or even in your hair.", tr: "Çok yönlü — boyna, çantaya, hatta saça bile takabilirsiniz.", best: true, feedbackTr: "Birden çok kullanım fikri verdin." },
+        { en: "However you want.", tr: "Nasıl isterseniz.", feedbackTr: "Müşteri tavsiye istiyor; somut fikir ver." },
+      ] },
+      { speaker: "client", en: "I usually wear simple, neutral colors.", tr: "Genelde sade, nötr renkler giyiyorum.", replies: [
+        { en: "Then this scarf is perfect — it adds a soft touch of color without being too much.", tr: "O zaman bu eşarp mükemmel — fazla olmadan yumuşak bir renk dokunuşu katar.", best: true, feedbackTr: "Tarzına uygun, kişisel öneri." },
+        { en: "You should change your style.", tr: "Tarzınızı değiştirmelisiniz.", feedbackTr: "Müşterinin tarzını eleştirme." },
+      ] },
+      { speaker: "client", en: "You have a great eye. I'll take it.", tr: "Çok iyi bir gözünüz var. Alıyorum.", replies: [
+        { en: "Thank you! May I show you how to tie it before you go?", tr: "Teşekkürler! Gitmeden bağlamayı göstereyim mi?", best: true, feedbackTr: "Ekstra hizmet = unutulmaz deneyim." },
+      ] },
+    ],
+  },
+
+  {
+    slug: "appointment-phone",
+    title: "Booking an Appointment (Phone)",
+    titleTr: "Telefonla Randevu Almak",
+    emoji: "📞",
+    kind: "client",
+    descriptionTr: "Telefon çalıyor. Bir müşteri özel bir alışveriş randevusu almak istiyor.",
+    difficulty: 2,
+    steps: [
+      { speaker: "narrator", en: "The boutique phone rings. You answer.", tr: "Butik telefonu çalıyor. Açıyorsun." },
+      { speaker: "client", en: "Hello, I'd like to book a private appointment.", tr: "Merhaba, özel bir randevu almak istiyorum.", replies: [
+        { en: "Good afternoon, thank you for calling Louis Vuitton. I'd be happy to help. May I have your name?", tr: "İyi günler, Louis Vuitton'u aradığınız için teşekkürler. Memnuniyetle yardımcı olurum. Adınızı alabilir miyim?", best: true, feedbackTr: "Profesyonel telefon açılışı + isim." },
+        { en: "Yeah, when?", tr: "Tamam, ne zaman?", feedbackTr: "Çok gündelik; telefonda zarif ol." },
+      ] },
+      { speaker: "client", en: "It's Mr. Demir. Is Saturday at 3 possible?", tr: "Ben Bay Demir. Cumartesi saat 3 mümkün mü?", replies: [
+        { en: "Let me check… yes, Saturday at 3 p.m. is available. May I ask what you're looking for?", tr: "Kontrol edeyim… evet, Cumartesi 15:00 müsait. Ne aradığınızı sorabilir miyim?", best: true, feedbackTr: "Onayla + hazırlık için ihtiyacı öğren." },
+        { en: "We are full, sorry.", tr: "Doluyuz, üzgünüm.", feedbackTr: "Önce kontrol et; kolayca reddetme." },
+      ] },
+      { speaker: "client", en: "An anniversary gift for my wife.", tr: "Eşime yıldönümü hediyesi.", replies: [
+        { en: "How thoughtful. I'll prepare a lovely selection for you. See you Saturday, Mr. Demir!", tr: "Ne kadar düşünceli. Sizin için güzel bir seçki hazırlayacağım. Cumartesi görüşürüz, Bay Demir!", best: true, feedbackTr: "Kişisel + hazırlıklı; randevuyu sahiplendin." },
+      ] },
+    ],
+  },
+
+  {
+    slug: "manager-feedback",
+    title: "Performance Feedback",
+    titleTr: "Performans Geri Bildirimi",
+    emoji: "📈",
+    kind: "manager",
+    descriptionTr: "Yöneticin sana yapıcı geri bildirim veriyor. Profesyonelce karşıla.",
+    difficulty: 3,
+    steps: [
+      { speaker: "manager", en: "Hülya, your sales are strong, but you forget to offer the client card.", tr: "Hülya, satışların güçlü ama müşteri kartı önermeyi unutuyorsun.", replies: [
+        { en: "Thank you for the feedback. You're right — I'll make it part of every sale.", tr: "Geri bildirim için teşekkürler. Haklısınız — bunu her satışın parçası yapacağım.", best: true, feedbackTr: "Açık fikirli + aksiyon planı." },
+        { en: "That's not my job.", tr: "Bu benim işim değil.", feedbackTr: "Savunmaya geçme; geri bildirimi kabul et." },
+      ] },
+      { speaker: "manager", en: "Great attitude. Is there anything you need from me?", tr: "Harika tavır. Benden ihtiyacın olan bir şey var mı?", replies: [
+        { en: "Could we do a short role-play together? I'd like to practice the wording.", tr: "Birlikte kısa bir rol-yapma yapabilir miyiz? İfadeleri pratik etmek isterim.", best: true, feedbackTr: "İnisiyatif + gelişim isteği." },
+        { en: "No, I'm fine.", tr: "Hayır, iyiyim.", feedbackTr: "Destek isteme fırsatını kullan." },
+      ] },
+      { speaker: "manager", en: "Of course. Let's do it after lunch.", tr: "Tabii. Öğleden sonra yapalım.", replies: [
+        { en: "Perfect, thank you. I really appreciate your support.", tr: "Mükemmel, teşekkürler. Desteğinizi gerçekten takdir ediyorum.", best: true, feedbackTr: "Minnettarlık güçlü bir profesyonel kapanıştır." },
+      ] },
+    ],
+  },
+
+  {
+    slug: "manager-cover-shift",
+    title: "Covering a Shift",
+    titleTr: "Vardiya Devralmak",
+    emoji: "🕘",
+    kind: "manager",
+    descriptionTr: "Yöneticin bir arkadaşın hastalandığı için yardımına ihtiyaç duyuyor.",
+    difficulty: 1,
+    steps: [
+      { speaker: "manager", en: "Hülya, Ayşe is sick today. Could you stay two more hours?", tr: "Hülya, Ayşe bugün hasta. İki saat daha kalabilir misin?", replies: [
+        { en: "Sure, I can help. Let me just inform my family that I'll be late.", tr: "Tabii, yardım edebilirim. Geç kalacağımı aileme haber vereyim.", best: true, feedbackTr: "İş birlikçi + net iletişim." },
+        { en: "No way.", tr: "Asla.", feedbackTr: "Kaba; kibarca ifade et veya koşul belirt." },
+      ] },
+      { speaker: "manager", en: "Thank you so much. The afternoon can get busy.", tr: "Çok teşekkürler. Öğleden sonra yoğun olabilir.", replies: [
+        { en: "No problem. Should I focus on the floor or the fitting area?", tr: "Sorun değil. Satış alanına mı yoksa deneme alanına mı odaklanayım?", best: true, feedbackTr: "Proaktif; nasıl yardımcı olacağını sor." },
+        { en: "Okay.", tr: "Tamam.", feedbackTr: "Biraz daha inisiyatif göster." },
+      ] },
+      { speaker: "manager", en: "Cover the floor, please. You're a great team player.", tr: "Satış alanını üstlen lütfen. Harika bir takım oyuncususun.", replies: [
+        { en: "Thank you! I'm happy to help the team.", tr: "Teşekkürler! Takıma yardım etmekten mutluyum.", best: true, feedbackTr: "Pozitif takım ruhu." },
+      ] },
+    ],
+  },
 ];
 
 export function getScenario(slug: string): Scenario | undefined {

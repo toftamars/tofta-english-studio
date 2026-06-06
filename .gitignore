@@ -27,6 +27,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# CI workflow: workflow izni verilince eklenecek
-.github/
