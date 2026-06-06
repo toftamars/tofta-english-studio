@@ -29,61 +29,92 @@ export function SimulatorPlay() {
   const [heard, setHeard] = useState<HeardResult | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const recRef = useRef<ReturnType<typeof createRecognizer> | null>(null);
+  const advanceTimerRef = useRef<number | null>(null);
+  const genRef = useRef(0); // adım/mod değişince eski geri çağrıları geçersiz kılar
   const recSupported = isRecognitionSupported();
 
-  const stopListening = useCallback(() => {
-    try {
-      recRef.current?.stop();
-    } catch {
-      /* yoksay */
+  const clearAdvanceTimer = useCallback(() => {
+    if (advanceTimerRef.current !== null) {
+      clearTimeout(advanceTimerRef.current);
+      advanceTimerRef.current = null;
     }
+  }, []);
+
+  const stopListening = useCallback(() => {
+    const rec = recRef.current;
     recRef.current = null;
+    if (rec) {
+      rec.onresult = null;
+      rec.onerror = null;
+      rec.onend = null;
+      try {
+        rec.stop();
+      } catch {
+        /* yoksay */
+      }
+    }
     setListening(false);
   }, []);
 
   useEffect(() => {
+    genRef.current++;
     setStepIdx(0);
     setChoices({});
     setFinished(false);
     setHeard(null);
     window.scrollTo(0, 0);
     return () => {
+      genRef.current++;
       cancelSpeech();
       stopListening();
+      clearAdvanceTimer();
     };
-  }, [slug, stopListening]);
+  }, [slug, stopListening, clearAdvanceTimer]);
 
   // Mevcut adım için: seslendir; sesli modda bitince dinlemeye geç
   useEffect(() => {
     const step = scenario?.steps[stepIdx];
     if (!step || finished) return;
+    const gen = ++genRef.current; // bu çalıştırmaya özel kimlik
     setHeard(null);
+    stopListening();
+    clearAdvanceTimer();
 
     if (step.speaker === "narrator") {
       if (voiceMode) {
-        const t = setTimeout(() => setStepIdx((s) => Math.min(s + 1, scenario.steps.length - 1)), 1100);
-        return () => clearTimeout(t);
+        advanceTimerRef.current = window.setTimeout(() => {
+          if (gen !== genRef.current) return;
+          setStepIdx((s) => Math.min(s + 1, scenario.steps.length - 1));
+        }, 1100);
       }
-      return;
+      return () => clearAdvanceTimer();
     }
 
     speak(step.en, {
       onEnd: () => {
+        if (gen !== genRef.current) return;
         if (voiceMode && step.replies?.length && choices[stepIdx] === undefined) {
-          beginListening(step);
+          beginListening(step, gen);
         }
       },
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stepIdx, scenario, voiceMode]);
 
-  function beginListening(step: DialogueStep) {
-    if (!recSupported) return;
+    return () => {
+      cancelSpeech();
+      stopListening();
+      clearAdvanceTimer();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepIdx, scenario, voiceMode, finished]);
+
+  function beginListening(step: DialogueStep, gen: number) {
+    if (!recSupported || gen !== genRef.current) return;
     const rec = createRecognizer();
     if (!rec) return;
-    recRef.current = rec;
-    setListening(true);
+
+    // Handler'ları start'tan ÖNCE bağla (bazı tarayıcılarda yarış olmasın)
     rec.onresult = (e) => {
+      if (gen !== genRef.current) return;
       const text = e.results[0][0].transcript;
       const replies = step.replies ?? [];
       let bestIdx = 0;
@@ -98,33 +129,39 @@ export function SimulatorPlay() {
       setHeard({ text, matchedIdx: bestIdx, score: bestScore });
       setChoices((c) => ({ ...c, [stepIdx]: bestIdx }));
       stopListening();
-      // kısa bir geri bildirimden sonra ilerle
-      window.setTimeout(() => {
-        setStepIdx((s) => {
-          if (s >= scenario!.steps.length - 1) {
-            setFinished(true);
-            completeScenario(scenario!.slug);
-            return s;
-          }
-          return s + 1;
-        });
+      clearAdvanceTimer();
+      advanceTimerRef.current = window.setTimeout(() => {
+        if (gen !== genRef.current) return;
+        advanceToNext();
       }, 1600);
     };
-    rec.onerror = () => stopListening();
-    rec.onend = () => setListening(false);
+    rec.onerror = () => {
+      if (gen === genRef.current) stopListening();
+    };
+    rec.onend = () => {
+      if (gen === genRef.current && recRef.current === rec) setListening(false);
+    };
+
+    recRef.current = rec;
+    setListening(true);
     try {
       rec.start();
     } catch {
-      setListening(false);
+      stopListening();
     }
+  }
+
+  function retryListen() {
+    const step = scenario?.steps[stepIdx];
+    if (step && step.speaker !== "narrator") beginListening(step, genRef.current);
   }
 
   function toggleVoiceMode() {
     const next = !voiceMode;
-    if (!next) {
-      stopListening();
-      cancelSpeech();
-    }
+    genRef.current++;
+    stopListening();
+    cancelSpeech();
+    clearAdvanceTimer();
     // Açıldığında: stepIdx/voiceMode bağımlı effect mevcut adımı seslendirip dinletecek.
     setVoiceMode(next);
   }
@@ -146,10 +183,27 @@ export function SimulatorPlay() {
   const isLast = stepIdx >= scenario.steps.length - 1;
 
   function pickReply(idx: number) {
+    // Elle seçim: açık mikrofon/zamanlayıcı ile yarışı önle
+    genRef.current++;
+    stopListening();
+    clearAdvanceTimer();
     setChoices((c) => ({ ...c, [stepIdx]: idx }));
   }
 
+  function advanceToNext() {
+    setStepIdx((s) => {
+      if (s >= scenario!.steps.length - 1) {
+        setFinished(true);
+        completeScenario(scenario!.slug);
+        return s;
+      }
+      return s + 1;
+    });
+  }
+
   function advance() {
+    clearAdvanceTimer();
+    stopListening();
     if (isLast) {
       setFinished(true);
       completeScenario(scenario!.slug);
@@ -223,6 +277,13 @@ export function SimulatorPlay() {
             </span>
           ) : null}
         </div>
+      )}
+
+      {/* Sesli modda dinleme bittiyse ve seçim yapılmadıysa: tekrar dinle */}
+      {voiceMode && !finished && !listening && current?.replies?.length && choices[stepIdx] === undefined && (
+        <button onClick={retryListen} className="btn-ghost self-start !px-4 !py-2 text-sm">
+          <Mic size={15} /> Tekrar dinle
+        </button>
       )}
 
       {/* Etkileşim alanı */}
