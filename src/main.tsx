@@ -20,3 +20,12 @@ createRoot(document.getElementById("root")!).render(
     </HashRouter>
   </StrictMode>,
 );
+
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    const base = import.meta.env.BASE_URL || "/";
+    navigator.serviceWorker.register(`${base}sw.js`).catch(() => {
+      /* offline opsiyonel */
+    });
+  });
+}

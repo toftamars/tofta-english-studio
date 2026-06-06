@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Flame, Lightbulb, Sparkles, Theater, Type, X } from "lucide-react";
+import { ArrowRight, Flame, Lightbulb, Sparkles, Theater, Type, X, Zap } from "lucide-react";
+import { poolStats } from "../../lib/exercisePool";
 import { useAuth } from "../../context/AuthContext";
 import { useProgress } from "../../context/ProgressContext";
 import { useMode } from "../../context/ModeContext";
@@ -37,6 +38,7 @@ export function Dashboard() {
   const units = getUnits(user.profileId, mode, cefr);
   const scenarios = getScenarios(user.profileId, mode, cefr);
   const word = getWordOfDay();
+  const drillStats = poolStats(user.profileId);
 
   const nextUnit = units.find((u) => !isUnitDone(u.slug)) ?? units[units.length - 1];
   const nextScenario =
@@ -72,7 +74,7 @@ export function Dashboard() {
           <div className="flex-1 text-sm text-espresso">
             <p className="font-semibold">Hoş geldin {profile.name}! 👋</p>
             <p className="text-ink/80">
-              Her gün: <b>Günün kelimesi → bir ders → bir senaryo{reviewsDue > 0 ? " → tekrar" : ""}</b>.
+              Her gün: <b>Günün kelimesi → alıştırma → bir ders → bir senaryo{reviewsDue > 0 ? " → tekrar" : ""}</b>.
               Mod değiştirmek için üstteki {modeMeta.label} etiketine dokun.
             </p>
           </div>
@@ -101,6 +103,9 @@ export function Dashboard() {
             Bugünün dersini başla <ArrowRight size={18} />
           </Link>
           <div className="flex flex-wrap gap-2 border-t border-line pt-3">
+            <Link to="/app/drill" className="chip min-h-[40px] items-center gap-1.5 hover:border-cognac">
+              <Zap size={14} /> Alıştır · <b className="text-espresso">{drillStats.total}+</b> kelime
+            </Link>
             <Link to="/app/radar" className="chip min-h-[40px] items-center gap-1.5 hover:border-cognac">
               <Type size={14} /> Kelime: <b className="text-espresso">{word.en}</b>
             </Link>
@@ -164,6 +169,21 @@ export function Dashboard() {
           })}
         </div>
       </section>
+
+      {/* Kelime & cümle merkezi */}
+      <Link
+        to="/app/drill"
+        className="card-luxe flex items-center gap-4 bg-gradient-to-br from-cognac/90 to-cognacDeep p-6 text-white transition hover:-translate-y-0.5"
+      >
+        <Zap size={32} className="text-gold" />
+        <div className="flex-1">
+          <p className="font-serif text-2xl">Kelime & Cümle Merkezi</p>
+          <p className="text-sm text-white/80">
+            Ezberle · tamamla · eşleştir · sınırsız tur · {drillStats.total}+ havuz
+          </p>
+        </div>
+        <ArrowRight />
+      </Link>
 
       {/* Simülatör vurgusu */}
       <Link

@@ -48,6 +48,9 @@
   .btn-ghost {
     @apply btn border border-line bg-paper text-ink hover:border-cognac;
   }
+  .btn-secondary {
+    @apply btn border border-line bg-paper text-ink hover:bg-cream;
+  }
   .btn-gold {
     @apply btn bg-gradient-to-br from-gold to-cognac text-white shadow-soft;
   }

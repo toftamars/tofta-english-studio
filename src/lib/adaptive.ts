@@ -154,6 +154,36 @@ export function recordListeningAdaptive(
   };
 }
 
+/** Alıştırma turu — kelime/cümle egzersizi */
+export function recordDrillAdaptive(
+  adaptive: AdaptiveState,
+  mode: LearningMode,
+  correct: boolean,
+  front: string,
+  back: string,
+): AdaptiveState {
+  let skills = bumpSkill(adaptive.skills, "vocab", correct ? 2 : -1);
+  if (correct) skills = bumpSkill(skills, "grammar", 1);
+  else skills = bumpSkill(skills, "grammar", -1);
+
+  let reviews = [...adaptive.reviews];
+  if (!correct && back) {
+    reviews.push(makeReviewItem(mode, "vocab", front, back, front));
+  }
+
+  return {
+    ...adaptive,
+    skills,
+    cefrBand: cefrFromSkills(skills),
+    reviews,
+    history: [
+      ...adaptive.history.slice(-99),
+      { date: new Date().toISOString(), kind: "drill", score: correct ? 100 : 0, mode },
+    ],
+    updatedAt: new Date().toISOString(),
+  };
+}
+
 /** Yazma görevi tamamlandı */
 export function recordWritingAdaptive(adaptive: AdaptiveState, mode: LearningMode): AdaptiveState {
   const skills = bumpSkill(adaptive.skills, "writing", 2);

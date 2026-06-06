@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { LearningMode, LessonSectionKind, QuizQuestion, UserProgress, VocabItem } from "../types";
+import type { LearningMode, LessonSectionKind, QuizQuestion, UserProgress, VocabItem, DrillExercise } from "../types";
 import { useAuth } from "./AuthContext";
 import {
   defaultProgress,
@@ -8,6 +8,7 @@ import {
   XP_PER_SCENARIO,
   XP_PER_SECTION,
   XP_PER_UNIT_BONUS,
+  XP_PER_DRILL_CORRECT,
 } from "../lib/storage";
 import {
   defaultAdaptive,
@@ -18,6 +19,7 @@ import {
   recordScenarioAdaptive,
   recordVocabMiss,
   recordWritingAdaptive,
+  recordDrillAdaptive,
   reviewsDueToday,
   unitsForMode,
 } from "../lib/adaptive";
@@ -42,6 +44,7 @@ interface ProgressContextValue {
   recordListeningScore(scorePct: number, mode?: LearningMode): void;
   recordWritingDone(mode?: LearningMode): void;
   recordVocabWrong(items: VocabItem[], mode?: LearningMode): void;
+  recordDrillAnswer(correct: boolean, exercise: DrillExercise, wrongText?: string): void;
   gradeReview(reviewId: string, correct: boolean): void;
   setActiveMode(mode: LearningMode): void;
   isSectionDone(unitSlug: string, kind: LessonSectionKind, mode?: LearningMode): boolean;
@@ -219,6 +222,19 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     [progress, persist, activeMode],
   );
 
+  const recordDrillAnswer = useCallback(
+    (correct: boolean, exercise: DrillExercise, _wrongText?: string) => {
+      if (!progress) return;
+      const next: UserProgress = structuredCloneSafe(progress);
+      if (correct) next.xp += XP_PER_DRILL_CORRECT;
+      const front = exercise.speak ?? exercise.prompt;
+      const back = exercise.answer;
+      next.adaptive = recordDrillAdaptive(next.adaptive ?? defaultAdaptive(), activeMode, correct, front, back);
+      persist(next);
+    },
+    [progress, persist, activeMode],
+  );
+
   const gradeReview = useCallback(
     (reviewId: string, correct: boolean) => {
       if (!progress?.adaptive) return;
@@ -286,6 +302,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         recordListeningScore,
         recordWritingDone,
         recordVocabWrong,
+        recordDrillAnswer,
         gradeReview,
         setActiveMode,
         isSectionDone,

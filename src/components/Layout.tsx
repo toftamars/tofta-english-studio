@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { BookOpen, LayoutDashboard, LogOut, Radar, RefreshCw, Settings, ShoppingBag, Sparkles, Theater, TrendingUp, Layers } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogOut, Radar, RefreshCw, Settings, ShoppingBag, Sparkles, Theater, TrendingUp, Layers, Zap } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useProgress } from "../context/ProgressContext";
 import { useMode } from "../context/ModeContext";
@@ -12,6 +12,7 @@ import { cn } from "../lib/cn";
 const NAV = [
   { to: "/app", label: "Panel", icon: LayoutDashboard, end: true },
   { to: "/app/lessons", label: "Dersler", icon: BookOpen },
+  { to: "/app/drill", label: "Alıştır", icon: Zap },
   { to: "/app/simulator", label: "Simülatör", icon: Theater },
   { to: "/app/review", label: "Tekrar", icon: RefreshCw },
   { to: "/app/radar", label: "Radar", icon: Radar },

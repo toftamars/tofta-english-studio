@@ -58,9 +58,20 @@ export function VocabSection({ unit }: { unit: Unit }) {
 }
 
 function Flashcard({ item }: { item: VocabItem }) {
+  const { recordVocabWrong } = useProgress();
+  const { mode } = useMode();
   const [flipped, setFlipped] = useState(false);
+  const [graded, setGraded] = useState(false);
   const flip = () => setFlipped((f) => !f);
+
+  function markKnown(known: boolean) {
+    if (graded) return;
+    setGraded(true);
+    if (!known) recordVocabWrong([item], mode);
+  }
+
   return (
+    <div className="flex flex-col gap-2">
     <div
       role="button"
       tabIndex={0}
@@ -90,6 +101,25 @@ function Flashcard({ item }: { item: VocabItem }) {
           {item.example && <span className="text-sm italic text-ivory/70">"{item.example}"</span>}
         </div>
       </div>
+    </div>
+    {flipped && !graded && (
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => markKnown(false)}
+          className="flex-1 min-h-[40px] rounded-xl border border-line text-xs text-muted"
+        >
+          Bilmiyorum
+        </button>
+        <button
+          type="button"
+          onClick={() => markKnown(true)}
+          className="flex-1 min-h-[40px] rounded-xl bg-cognac/15 text-xs font-medium text-cognac"
+        >
+          Biliyorum
+        </button>
+      </div>
+    )}
     </div>
   );
 }

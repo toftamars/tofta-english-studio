@@ -80,6 +80,8 @@ export const progressRepo: ProgressRepo = supabase ? new CloudProgressRepo() : n
 export const XP_PER_SECTION = 10;
 export const XP_PER_UNIT_BONUS = 25;
 export const XP_PER_SCENARIO = 30;
+export const XP_PER_DRILL_CORRECT = 2;
+export const XP_PER_DRILL_ROUND = 10;
 
 export interface LevelInfo {
   level: number;

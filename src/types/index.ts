@@ -275,6 +275,34 @@ export type ParsedProduct = Partial<
 
 // ---------------- Otomatik Çalışma Kartları ----------------
 
+export type DrillKind = "flashcard" | "cloze" | "choice" | "match" | "order" | "mixed";
+
+/** Procedural alıştırma egzersizi */
+export interface DrillExercise {
+  id: string;
+  kind: DrillKind;
+  prompt: string;
+  promptTr?: string;
+  answer: string;
+  options?: string[];
+  hint?: string;
+  speak?: string;
+  /** cloze: cümlede boşluklu metin */
+  sentence?: string;
+  /** order: karışık kelimeler */
+  words?: string[];
+}
+
+/** Kelime/cümle havuzu girdisi */
+export interface PoolEntry {
+  en: string;
+  tr: string;
+  example?: string;
+  def?: string;
+  mode?: LearningMode;
+  tags?: string[];
+}
+
 export type StudyCardKind = "flashcard" | "quiz" | "dialogue";
 
 /** Ürün/insider nottan otomatik üretilen çalışma kartı (şablon tabanlı, deterministik). */
