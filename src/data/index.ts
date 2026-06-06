@@ -5,7 +5,9 @@ import { SOCIAL_UNITS } from "./curriculum-social";
 import { B1_MANAGER_UNITS } from "./curriculum-b1";
 import { HULYA_SCENARIOS } from "./scenarios";
 import { ISTINYE_SCENARIOS } from "./scenarios-istinye";
-import { DAILY_SCENARIOS, SOCIAL_SCENARIOS } from "./scenarios-modes";
+import { WORK_EXTRA_SCENARIOS } from "./scenarios-work-bank";
+import { DAILY_SCENARIOS } from "./scenarios-daily-bank";
+import { SOCIAL_SCENARIOS } from "./scenarios-social-bank";
 import { cefrAtLeast } from "./modes";
 import type { CefrBand } from "../types";
 
@@ -13,7 +15,7 @@ export { PROFILES, PROFILE_LIST } from "./profiles";
 export { LEARNING_MODES, getModeMeta, cefrLabel, cefrAtLeast } from "./modes";
 
 const WORK_UNITS: Unit[] = [...HULYA_UNITS, ...B1_MANAGER_UNITS];
-const WORK_SCENARIOS: Scenario[] = [...HULYA_SCENARIOS, ...ISTINYE_SCENARIOS];
+const WORK_SCENARIOS: Scenario[] = [...HULYA_SCENARIOS, ...ISTINYE_SCENARIOS, ...WORK_EXTRA_SCENARIOS];
 
 export const UNITS_BY_PROFILE_MODE: Record<ProfileId, Record<LearningMode, Unit[]>> = {
   hulya: {
