@@ -438,6 +438,55 @@ export const HULYA_SCENARIOS: Scenario[] = [
       ] },
     ],
   },
+
+  {
+    slug: "present-bag",
+    title: "Presenting the Bag & the Story",
+    titleTr: "Çantayı ve Hikâyesini Sunmak",
+    emoji: "✨",
+    kind: "client",
+    descriptionTr: "Müşteriye seçtiğin çantayı zarif bir şekilde, hikâyesiyle birlikte sun.",
+    difficulty: 2,
+    steps: [
+      { speaker: "narrator", en: "You bring the bag to the presentation table.", tr: "Çantayı sunum masasına getiriyorsun." },
+      { speaker: "client", en: "It looks beautiful. Tell me about it.", tr: "Çok güzel görünüyor. Bana anlatın.", replies: [
+        { en: "This is the Speedy, one of our most iconic designs since 1930.", tr: "Bu Speedy, 1930'dan beri en ikonik tasarımlarımızdan biri.", best: true, feedbackTr: "Harika — ürünü hikâyesiyle tanıttın." },
+        { en: "It's just a bag.", tr: "Sadece bir çanta.", feedbackTr: "Değeri ve hikâyeyi anlat; bu bir Maison parçası." },
+        { en: "I'm not sure, let me check.", tr: "Emin değilim, bakayım.", feedbackTr: "Ürünü iyi bilmelisin; özgüvenle sun." },
+      ] },
+      { speaker: "client", en: "Why is it special?", tr: "Neden özel?", replies: [
+        { en: "It's handcrafted with our Monogram canvas, light yet very durable.", tr: "Monogram kanvasımızla el işçiliğiyle üretilir; hem hafif hem çok dayanıklı.", best: true, feedbackTr: "Malzeme + faydayı birlikte anlattın." },
+        { en: "Because it is expensive.", tr: "Çünkü pahalı.", feedbackTr: "Fiyat değil, değer ve zanaat anlatılır." },
+      ] },
+      { speaker: "client", en: "May I hold it?", tr: "Tutabilir miyim?", replies: [
+        { en: "Of course. Please feel the leather handles — notice how soft they are.", tr: "Tabii ki. Lütfen deri saplara dokunun — ne kadar yumuşak olduğunu hissedin.", best: true, feedbackTr: "Müşteriyi deneyime kattın — mükemmel." },
+        { en: "Be careful, it's fragile.", tr: "Dikkat edin, kırılgan.", feedbackTr: "Müşteriyi davet et, endişelendirme." },
+      ] },
+    ],
+  },
+
+  {
+    slug: "farewell-followup",
+    title: "Farewell & Follow-up",
+    titleTr: "Uğurlama ve Takip",
+    emoji: "🌿",
+    kind: "client",
+    descriptionTr: "Müşteriyi sıcak bir şekilde uğurla ve ilişkiyi sürdürecek bir takip öner.",
+    difficulty: 2,
+    steps: [
+      { speaker: "client", en: "Thank you, I really enjoyed today.", tr: "Teşekkürler, bugünden gerçekten keyif aldım.", replies: [
+        { en: "It was a pleasure to help you. I hope you'll love your new piece.", tr: "Size yardımcı olmak bir zevkti. Yeni parçanızı seveceğinizi umuyorum.", best: true, feedbackTr: "Sıcak ve kişisel bir kapanış." },
+        { en: "Okay, bye.", tr: "Tamam, görüşürüz.", feedbackTr: "Çok kısa; daha sıcak uğurla." },
+      ] },
+      { speaker: "client", en: "Will I hear from you again?", tr: "Sizden tekrar haber alır mıyım?", replies: [
+        { en: "May I take your details so I can let you know about new arrivals?", tr: "Yeni gelenleri haber verebilmem için bilgilerinizi alabilir miyim?", best: true, feedbackTr: "Clienteling — ilişkiyi sürdürmenin doğru yolu." },
+        { en: "No, we don't do that.", tr: "Hayır, biz bunu yapmayız.", feedbackTr: "Takip, luxury hizmetin kalbidir; fırsatı kaçırma." },
+      ] },
+      { speaker: "client", en: "That would be lovely. Thank you again.", tr: "Çok hoş olur. Tekrar teşekkürler.", replies: [
+        { en: "Thank you for visiting. Have a wonderful day — see you soon!", tr: "Ziyaretiniz için teşekkürler. Harika bir gün geçirin — yakında görüşmek üzere!", best: true, feedbackTr: "Zarif ve davetkâr bir veda." },
+      ] },
+    ],
+  },
 ];
 
 export function getScenario(slug: string): Scenario | undefined {
