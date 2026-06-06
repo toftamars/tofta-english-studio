@@ -31,12 +31,15 @@ export function RadarPage() {
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    loadRadar().then((d) => {
-      setNews(d.news);
-      setUpdatedAt(d.updatedAt);
-    });
+    loadRadar()
+      .then((d) => {
+        setNews(d.news);
+        setUpdatedAt(d.updatedAt);
+      })
+      .catch((err) => console.error("Radar haberleri yüklenemedi:", err));
     listNotes()
       .then(setNotes)
+      .catch((err) => console.error("Notlar yüklenemedi:", err))
       .finally(() => setLoadingNotes(false));
   }, []);
 

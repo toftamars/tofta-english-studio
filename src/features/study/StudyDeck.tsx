@@ -16,6 +16,7 @@ export function StudyDeck() {
   useEffect(() => {
     Promise.all([listProducts(), listNotes()])
       .then(([products, notes]) => setCards(generateStudyCards(products, notes)))
+      .catch((err) => console.error("Çalışma kartları hazırlanamadı:", err))
       .finally(() => setLoading(false));
   }, []);
 

@@ -22,12 +22,17 @@ export function CatalogPage() {
   const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showBulk, setShowBulk] = useState(false);
 
   useEffect(() => {
     listProducts()
       .then(setProducts)
+      .catch((err) => {
+        console.error("Ürünler yüklenemedi:", err);
+        setLoadError(true);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -92,6 +97,12 @@ export function CatalogPage() {
 
       {showForm && <ProductForm userId={user?.id} onSubmit={handleAdd} onCancel={() => setShowForm(false)} />}
       {showBulk && <BulkForm onSubmit={handleBulkAdd} onCancel={() => setShowBulk(false)} />}
+
+      {loadError && (
+        <div className="rounded-2xl bg-cognac/10 px-4 py-3 text-sm text-cognac">
+          Ürünler yüklenemedi (bağlantı sorunu olabilir). İnternetini kontrol edip sayfayı yenile.
+        </div>
+      )}
 
       {loading ? (
         <p className="animate-pulse text-sm text-muted">Ürünler yükleniyor…</p>

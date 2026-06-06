@@ -41,11 +41,20 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       return;
     }
     setLoading(true);
-    progressRepo.load(user.profileId, user.id).then((p) => {
-      if (!active) return;
-      setProgress(touchStreak(p));
-      setLoading(false);
-    });
+    progressRepo
+      .load(user.profileId, user.id)
+      .then((p) => {
+        if (!active) return;
+        setProgress(touchStreak(p));
+      })
+      .catch((err) => {
+        // Yükleme başarısız olsa bile uygulama kilitlenmesin (varsayılan ilerlemeyle aç)
+        console.error("İlerleme yüklenemedi:", err);
+        if (active) setProgress(touchStreak(defaultProgress(user.profileId)));
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
     return () => {
       active = false;
     };
