@@ -1,6 +1,48 @@
 {
-  "updatedAt": "2026-06-20T05:30:48.161Z",
+  "updatedAt": "2026-06-21T05:37:38.640Z",
   "news": [
+    {
+      "title": "A look at Horizon Aluminium, Louis Vuitton’s first aluminium suitcase",
+      "source": "Lifestyle Asia Hong Kong",
+      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQcWl4b2c0SGVCSDdBcUU3UU9UVW5OOHF4M3VMVU90aFpZeExZNmpucjdIWm1ucVR6R0hfbW9pNk0wNHhKOXlIWWVlTy1OT1F2R0tRN05tYUJFd21yT09zSHl1ZUViNThjbFN5TXpaLU9VbmMzZ2VQNS1SYzh2ODVEZVNNOG5haTNfcEhJZzl6WXU0eEpaTEZsOWdPVlN3LUU1UzAzeE9GQzd6WmVpd2RVd1N0MFIzWGNI?oc=5",
+      "publishedAt": "2026-06-21T03:45:00.000Z",
+      "tag": "Marka"
+    },
+    {
+      "title": "Sole searching",
+      "source": "The New Indian Express",
+      "url": "https://news.google.com/rss/articles/CBMid0FVX3lxTE55VkQxLU5rbUFZVUVQOXkyS2pyWjFEbk1lYTFONXVaeVBEbkdWc1pFVzJaWm9zZ0lmX1hKMHNyaVd4YmZYTHJNaEtXeTV4VTJiVnFFT0Zhc3RkOXdkWUJsRkM4TzViWW5RYVhhM1EyUG5xc0ZPRno00gGEAUFVX3lxTFA3TFpvMlJlTzB0TXlLRTB2SG1aMWdibGhWSlBpMjN2ZWI0UGk5Wko3dkY3NS1WYzB3M00wWGtfeFNqQ2Mya1JTYUE4NURKQmhQNnhFbWlwMmcyaXNPS3QxTDNQalY4LVBuTXZqeEdxbmNpb0Z4QnBHLVRyN0txV0lLVllGaQ?oc=5",
+      "publishedAt": "2026-06-21T00:38:00.000Z",
+      "tag": "Marka"
+    },
+    {
+      "title": "Lee Hyun-ee Sells Luxury Items at Drastic Discounts in Flea Market",
+      "source": "조선일보",
+      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPQ1AyRzBZLWJHOXlHZHhvNXlaa1B2djllSXJMTkFLbmxodjRNREc1QnlNS0xJUU5JeDlmaDd4eTJJbnZtNVpiRUQxWHdjU05YOTQwZktTV1BoVzFCSmtldDNFVzVvT25OSmxObXFpWUJQVTFzUUtxekJwTzEwejk4QXVEYklXYVczRFVKV3l3?oc=5",
+      "publishedAt": "2026-06-20T14:23:44.000Z",
+      "tag": "Marka"
+    },
+    {
+      "title": "LVMH Moët Hennessy Louis Vuitton Stock - Long-term brand strategy under scrutiny",
+      "source": "AD HOC NEWS",
+      "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxPT1J4VlVIazR5eGN0Ung3eVY3Q0Q3RHp1VFIxejFiZk1wamNCcGtmZW9OWHVRc1ljeDVmUXhTT0l6VUdmbnJlMmdWWGRtdjl5QVRoeWdRc0RZalVZUW9YaU5Fbkd6cktaOHU2QTZVdGl1OGNydGg3RW9nM2VISVFjandUR1hwOGdmZlg5SlhsT1BvRnFJUlo3N3I2emlZMWo0Ql9KZmM1MzJoZEs5Umgzelh5Q3U1VVE2YXJJS014TDlObFBSN25B?oc=5",
+      "publishedAt": "2026-06-20T12:39:35.000Z",
+      "tag": "Sektör"
+    },
+    {
+      "title": "Céline Assimon Joins Luxury Resorts Group Kerzner International, Owner of Brands Including One&Only",
+      "source": "WWD",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQcWc3LWlIcjNoUTl4MFFqNjlwWExKYjZuT0NHbHpFN1FVaWQwN2FWQ0FmQjR1WG91N0dRb1dRcG54QmpJQ3MtajNmVEV6Tm9VZlBQM201T1BnekNGeWkxRE5EZEo2QXlFcXY3VjBWd01iQUNzaFJNbTNCWkF6RWdnR3BfcnBZNGRHM3FGUEJlYjNjV2pLbmNGdHV6TzVKOElPM2g5eFpqN1NsNHJBbXdJb3p6OEY0QQ?oc=5",
+      "publishedAt": "2026-06-20T10:30:34.000Z",
+      "tag": "Marka"
+    },
+    {
+      "title": "From Tag Heuer to Zenith — the best luxury watches to buy now",
+      "source": "The Times",
+      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQRWM1UTJPT3I3OF9pWHMwMlNFTVUxSGVHRmVJcUN5VTZEMDh0UmhaeTlnTlJVa09YUDY5RjI2RDZTQVpVbUkxWnIyUjhvWDFKTTdySHE5MnlYY3NzdWRhc1QzbjhKQklyVXlBUWhKR3R5V2VGS0RHVVdWT25kVnNpb1Naam52LXZ5WkZmY3RyNWsyVGhzMFJqV2xxQ2VkUQ?oc=5",
+      "publishedAt": "2026-06-19T21:00:00.000Z",
+      "tag": "Marka"
+    },
     {
       "title": "Mountain Mayhem: Louis Vuitton’s Savoir Rêver comes to Aspen",
       "source": "AspenTimes.com",
@@ -9,39 +51,11 @@
       "tag": "Marka"
     },
     {
-      "title": "Céline Assimon Joins Luxury Resorts Group Kerzner International, Owner of Brands Including One&Only",
-      "source": "WWD",
-      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQcWc3LWlIcjNoUTl4MFFqNjlwWExKYjZuT0NHbHpFN1FVaWQwN2FWQ0FmQjR1WG91N0dRb1dRcG54QmpJQ3MtajNmVEV6Tm9VZlBQM201T1BnekNGeWkxRE5EZEo2QXlFcXY3VjBWd01iQUNzaFJNbTNCWkF6RWdnR3BfcnBZNGRHM3FGUEJlYjNjV2pLbmNGdHV6TzVKOElPM2g5eFpqN1NsNHJBbXdJb3p6OEY0QQ?oc=5",
-      "publishedAt": "2026-06-19T17:10:33.000Z",
-      "tag": "Marka"
-    },
-    {
-      "title": "'Responsibly made' luxury brand Salon 1884 ran Garment District sweatshop, DA says",
-      "source": "Gothamist",
-      "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPZ2tyRGplb0hXQ01aeDhtWUFYUGNBbjVoLU9CamEwRjdScVdacnNYVldHTmRiajdvcXlpeEVFVlRQVC1nU0Z6RzJ0X21vanAzTXVjNGx5TlI3OVdoRDBKR1FmcDdPZ3d3SXB4MTVkSzFyQVEtbjk3ZjA1dTRBYWZ0NHA0bmZydktha2g1WC00WVFqa3BFeENiTEVsZWdOc09MMTNpLU4wbk1oZw?oc=5",
-      "publishedAt": "2026-06-19T17:01:00.000Z",
-      "tag": "Moda"
-    },
-    {
-      "title": "Kyoto: Louis Vuitton shop-in-shop opening",
-      "source": "superfuture",
-      "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNSDY5WWxhckNfYVZGY0kwX3VCcUgydG9TME1PZGhiX3ljZjFQN3F5S0FaMnlGZXkzYmZabTE0V29wdW9vWjhvdXo3NXJLVGZGUFFMOTV4REEwTURQWW1leVJDc0tpN2xuRG1oa3lSUnhqb0hOMHRCUVhjMmZVVEJEM0lIdDhtQ2VXUllZ?oc=5",
-      "publishedAt": "2026-06-19T15:49:48.000Z",
-      "tag": "Marka"
-    },
-    {
       "title": "Anne Hathaway is pregnant with her third child",
-      "source": "WNTZ-TV FOX 48",
-      "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQVzlRUWF0cHZPZDNwaGx1SXpQSV9vSkI3bjFXc3k3TDlkakF6SVVEVElLNlozNTZwYjNWdGRibnY5cDQ4czhlX09iNWhnUDMyS2F1Z1diSEZ4X1ZGYm1kdDVhdUVaS2IyUWpPTzgxenJaN2N5Z21jLXVOZ1hsSFBSRE1HSzZxNHdkbVhGcFBJTG82dGFKc0szZFhtMVN3bW5X0gGmAUFVX3lxTE1VU3NrZlh0UHJmQkY0TG5DdUZUeWNUUUlNN3dmd25wSUowb3N0MGdyb2FuZTJ3V1R1TTE2LTFDa3VKRU1zNVVqNzU1LXBUYjVRVHNvcEhiQkVidzhnWlBiV1VrVC15ZXhBYVp5cmxxOVBPRi13ZlFGSjhPZGg3U0hDbkVXUlBtMlk2UHBxQllnY205c2NJZW9fNEVQSzdHamt4d1B3OEE?oc=5",
+      "source": "KFOR.com",
+      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNcWlCZWYtb0gteHlZSFN2UzhTcnpvTzluMk9Pai05a1NROTV4UjdiUzRuWGpMRnVzTkEtWjhWZVRIWWxad1FJYWluNjdxZlJ1WkR5bG4tcjJxS0ZTb3g4dWtCdkNKNWpzallBM3ZUYXlZUXVGZHNsblhobUJJVGNZaEVvelBxc21iclhMdnhJd3ZGQkFyRTJIV29pcEwtTVk2NFE0VkRn0gGrAUFVX3lxTFBTLW1ZNXF0NUVFYUt3LU9IQTRTSnF4Yzc3ZUlQeWgtUDBnRkJUam14MkJ6WGlONXR6bkllXzJsZkJjcUxXOWVFanRsTnJkV05kX3R0VFVmWjFCcTR1M0hIbjVuQ3U3X25mLXdrVl95alI4ZW5oeVE0c1FLYTBvekdTeUJyVDBRUzdvSEJzMnp6VF9TYkgycTlHeHdibjRvcDFnSVA0WXJzcDl5bw?oc=5",
       "publishedAt": "2026-06-19T15:37:37.000Z",
       "tag": "Marka"
-    },
-    {
-      "title": "Egyptomania: From Luxury Brands to Publishing, Everyone Has Their Eyes on Egypt",
-      "source": "Whoopsee",
-      "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNdnk2dTNHU0ZwcTZ4d3JBOFZoWGJMbnRRRm5IWU1SWTBwZ1hiM1YtYzh6T2dCS1ZibUlib3MwU1l0akJFYnRjUlVpZmhGQnFwc3NzMFN5SkNIcVdQMzFtT2IyUWJ1MmlhMzlxYUhhZDZTVnpXSERZQTVWWGdZV2hJc2hQbmljbkNpMVNOUWNqSExHWGhWamJPelJaYWtGMXYxRTlZ?oc=5",
-      "publishedAt": "2026-06-19T13:28:10.000Z",
-      "tag": "Moda"
     },
     {
       "title": "One of the world’s richest persons Louis Vuitton CEO Bernard Arnault on Elon Musk becoming first-ever tri",
@@ -58,11 +72,18 @@
       "tag": "Marka"
     },
     {
-      "title": "VivaTech 2026: LVMH showcases innovation across its entire value chain",
-      "source": "Luxus Plus",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOYjdMNmhzQzl5b09sbnZoVTRxOWNGdkp4RGw1V2Vkc1RNTlhZYnQtcUNaNDB2T3c0S2owRnJiSVRFVGZWdmZYYkVCX1VKS19HZWE1ckFMWEgxZGFzTzFsSXhHVEp2VjlQM0V3cGR0eGtxLXdQRTh4eFlLWHpiUWdnNVhWNEd2ck1JcEdfNG14OFFYa1FVU1NDQV9DRXI?oc=5",
-      "publishedAt": "2026-06-19T07:59:40.000Z",
+      "title": "LVMH marks VivaTech’s 10th Anniversary",
+      "source": "LVMH",
+      "url": "https://news.google.com/rss/articles/CBMizAFBVV95cUxOWWctRmRTczVBODIyd3NKaVMtWlo1VmVBcktyaUR1eVR1MjBvVnZQMXdqMUxUN0pOOUdVVUZDTUpUcENpSVdSODBwUmtVajk5M0xFU0ptZlN4eXJlTnRyWTFIRFlUcWFUdTlTZjdHY1VZOUNJZjNPdlJ6MTNSYmpaa0tfUU5POS1rWVp5WjgyWGVsV3dBcGhYb2xFdDllc2trdWtjQVFTWE45djE2WGZQSlhucHlxYXBwNE4tQkFlMG1nUzU5NFlXYXpQMko?oc=5",
+      "publishedAt": "2026-06-19T07:00:00.000Z",
       "tag": "Sektör"
+    },
+    {
+      "title": "Thai Actor Fourth Is the Newest 'Friend of the House' for a French Luxury Giant",
+      "source": "Metro.Style",
+      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOcWtYM3drcGxFeG5MdDNOak1ETm00WEdiQ2phU3pURUZMblNFUk5HT01QNm9ESmJzNWpCQlVySnVTUGNxYWNGT1J5aEozdWNWR0U4Z0J0X2NhSUNsNmdTMk5YWkpyQ3g4UG55NXVrVTBhN015SGpkUElhVVItYnlNM0g3Vk13MVhTYVZNdDhiQl9JMGwxM0ZiN1I3N0NtYTBFMjdTRHJIYllTNmNsbGtMcHlNYw?oc=5",
+      "publishedAt": "2026-06-19T04:01:19.000Z",
+      "tag": "Marka"
     },
     {
       "title": "Netizens Can’t Get Over Louis Vuitton’s Latest Airplane-Shaped Handbag",
@@ -76,27 +97,6 @@
       "source": "Red Carpet Fashion Awards",
       "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxQeVNtTnNhUjJ3NHBhQnFDVFBSLWRBMlVSOEF5WDFScThYZmRhSGxVdXVlT2ZBVXAzYXprTVV1WVB6Q1ozT3E5dDduclJIUGszR21WeW9ycVFnT0ZsY1lfNDBiUHQ5SFBXcWwyQTBLU3BDNHZwNGlHQUNfYnkyd3U3YWlhcjkxZ1FJSUQ1Z21ka3k2SmtMS2pfMXZMTC1HcXYyV2R3Q2wzMmk3bnZLbUJhSjdWLVl6V2FpcnJReUhBSmZXS0pSWHJJX0x3?oc=5",
       "publishedAt": "2026-06-18T21:53:19.000Z",
-      "tag": "Marka"
-    },
-    {
-      "title": "LVMH CEO Bernard Arnault Says He Uses A.I. Weekly to Design Products",
-      "source": "observer.com",
-      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxOTTVwOXFXVFNxenBmcnZVMEh1R3UzQ2QwRlVNa2hFMFRKUmlCcWJrRmpMZ1ZsQ1B0c2pnb2drUXNadUUxQ2o0TmhVdWVXVnNwV1lxa0JLbHc2MzZPT3I4djQ2U3ZiaUR1V0x0cnZiRTU5N0ZkOWlYUXU2Vk9ZQmV2OUlXc2RrdEQwZ3lGWDUxakhXMTM5TzFhTldscEZTUQ?oc=5",
-      "publishedAt": "2026-06-18T18:23:16.000Z",
-      "tag": "Sektör"
-    },
-    {
-      "title": "At VivaTech 2026, ChatGPT becomes brands’ new showcase",
-      "source": "FashionNetwork USA",
-      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPdmVKMFBVVzVqVzV2V2pvQ2UyOXM3S0VJa0pZTGxDRy02cWYyLXdNMnZwT2kwQ3BhRW9Fb0V5dG45YUFtaGg2SmhCX2RwbEM0a2NwOW9GT2l6MTFreDBnRXgyRkNNOW9pWlpCMkR1NjRLNmV0b3JuWWNIWG50bjhSbjJmLXNiblQ1ZW5aNC1Kd2NMZng5T1VxWHBxQ3hGX05nVkE?oc=5",
-      "publishedAt": "2026-06-18T16:53:55.000Z",
-      "tag": "Sektör"
-    },
-    {
-      "title": "Louis Vuitton First Fridays and the luxury of access",
-      "source": "amNewYork",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQMXJlSTlYc1RWYUFWUmpSY1VQb3lHeFo0elAtdkI4Y3BUX2hWT0ZFQ2RxcFNwWS14YTUyOWFycjZEQXVKQTFqbmlIV295R194ay1MU2JtdkhMUWdyNWFJZko4al8wMWlabEhyVXRjRkdNNzNGYlhyVUtEdE9FOTFCbkhjWnlQUng2WTRTc3RzcFZIb3NZMHBiaG1BOEo?oc=5",
-      "publishedAt": "2026-06-18T16:00:16.000Z",
       "tag": "Marka"
     }
   ]
